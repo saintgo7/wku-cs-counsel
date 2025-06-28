@@ -1,5 +1,7 @@
 # 원광대학교 컴퓨터소프트웨어공학과 학생 상담관리 시스템
 
+WKU Dept. Computer Software Counsel Program
+
 ## 📋 프로젝트 개요
 
 원광대학교 컴퓨터소프트웨어공학과 학생들을 위한 종합 상담관리 시스템입니다. 학생들의 다양한 상담 요청을 체계적으로 분류하고 관리하며, 모든 상담 내용을 데이터베이스에 저장하여 지속적인 관리를 제공합니다.
@@ -32,7 +34,7 @@
 
 - **Backend**: Python Flask 2.3.3
 - **Database**: SQLite + SQLAlchemy ORM
-- **Frontend**: HTML5, Bootstrap 5, JavaScript
+- **Frontend**: HTML5, Tailwind CSS, JavaScript
 - **Styling**: CSS3, Font Awesome Icons
 - **Security**: Werkzeug Password Hashing, Session Management
 
@@ -40,8 +42,8 @@
 
 ### 1. 저장소 클론
 ```bash
-git clone https://github.com/saintgo7/elice-sangdam.git
-cd elice-sangdam
+git clone https://github.com/saintgo7/wku-cs-counsel.git
+cd wku-cs-counsel
 ```
 
 ### 2. 가상환경 생성 및 활성화
@@ -143,7 +145,7 @@ http://127.0.0.1:5000
 
 ## 📱 반응형 디자인
 
-- Bootstrap 5 기반 모바일 최적화
+- Tailwind CSS 기반 모바일 최적화
 - 태블릿, PC 등 다양한 화면 크기 지원
 - 직관적인 사용자 인터페이스
 
@@ -162,7 +164,7 @@ http://127.0.0.1:5000
 
 - **개발자**: saintgo7
 - **이메일**: saintgo7@gmail.com
-- **GitHub**: https://github.com/saintgo7/elice-sangdam
+- **GitHub**: https://github.com/saintgo7/wku-cs-counsel
 
 ## 📄 라이선스
 

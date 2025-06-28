@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}상담 관리 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-list-alt text-green-600 mr-3"></i>상담 관리
+                    </h1>
+                    <p class="text-xl text-gray-600">학생들의 상담을 관리하고 답변하세요</p>
+                </div>
+                <a href="{{ url_for('professor_dashboard') }}" 
+                   class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-arrow-left mr-2"></i>대시보드로
+                </a>
+            </div>
+        </div>
+
+        <!-- 필터링 섹션 -->
+        <div class="mb-8">
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-filter text-green-600 mr-2"></i>필터 및 검색
+                </h2>
+                <form method="GET" action="{{ url_for('professor_counselings') }}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                            <label for="category" class="block text-lg font-semibold text-gray-700 mb-2">분야</label>
+                            <select name="category" id="category" 
+                                    class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                                <option value="">전체</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.name }}" 
+                                            {% if current_filters.category == category.name %}selected{% endif %}>
+                                        {{ category.value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="status" class="block text-lg font-semibold text-gray-700 mb-2">상태</label>
+                            <select name="status" id="status" 
+                                    class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                                <option value="">전체</option>
+                                {% for status in statuses %}
+                                    <option value="{{ status.name }}" 
+                                            {% if current_filters.status == status.name %}selected{% endif %}>
+                                        {{ status.value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="urgency" class="block text-lg font-semibold text-gray-700 mb-2">긴급도</label>
+                            <select name="urgency" id="urgency" 
+                                    class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                                <option value="">전체</option>
+                                {% for level in range(1, 6) %}
+                                    <option value="{{ level }}" 
+                                            {% if current_filters.urgency == level|string %}selected{% endif %}>
+                                        {{ level }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="search" class="block text-lg font-semibold text-gray-700 mb-2">검색</label>
+                            <div class="flex">
+                                <input type="text" name="search" id="search" 
+                                       class="flex-1 px-4 py-3 text-lg border-2 border-gray-300 rounded-l-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                                       placeholder="학생명, 제목, 내용 검색..." 
+                                       value="{{ current_filters.search }}">
+                                <button type="submit" 
+                                        class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-r-xl transition-all duration-200">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                        <button type="submit" 
+                                class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                            <i class="fas fa-filter mr-2"></i>필터 적용
+                        </button>
+                        <a href="{{ url_for('professor_counselings') }}" 
+                           class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-center">
+                            <i class="fas fa-times mr-2"></i>초기화
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 상담 목록 -->
+        <div class="bg-white rounded-3xl shadow-2xl p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-comments text-green-600 mr-2"></i>상담 목록
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 ml-2">
+                        {{ counselings.total }}
+                    </span>
+                </h2>
+                <div class="text-lg text-gray-600">
+                    페이지 {{ counselings.page }} / {{ counselings.pages }}
+                </div>
+            </div>
+
+            {% if counselings.items %}
+                <div class="overflow-x-auto">
+                    <div class="space-y-4">
+                        {% for counseling in counselings.items %}
+                        <div class="bg-gray-50 rounded-2xl p-6 {% if counseling.urgency_level >= 4 %}border-l-4 border-red-500 bg-red-50{% endif %}">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                <!-- 제목 및 내용 -->
+                                <div class="lg:col-span-4">
+                                    <div class="mb-2">
+                                        <a href="{{ url_for('professor_view_counseling', counseling_id=counseling.id) }}" 
+                                           class="text-xl font-bold text-gray-800 hover:text-green-600 transition-colors">
+                                            {{ counseling.counseling_title }}
+                                            {% if counseling.urgency_level >= 4 %}
+                                                <i class="fas fa-exclamation-triangle text-red-500 ml-2" title="긴급"></i>
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                    <p class="text-gray-600 text-lg">
+                                        {{ counseling.counseling_content[:100] }}...
+                                    </p>
+                                </div>
+
+                                <!-- 학생 정보 -->
+                                <div class="lg:col-span-2">
+                                    <div class="text-lg font-semibold text-gray-800">{{ counseling.student_name }}</div>
+                                    <div class="text-gray-600">{{ counseling.student_id }}</div>
+                                    <div class="text-gray-600">{{ counseling.grade }}학년</div>
+                                </div>
+
+                                <!-- 분야 및 상태 -->
+                                <div class="lg:col-span-2">
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                            {{ counseling.get_category_name() }}
+                                        </span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                                   {% if counseling.urgency_level >= 4 %}bg-red-100 text-red-800
+                                                   {% elif counseling.urgency_level >= 3 %}bg-yellow-100 text-yellow-800
+                                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            긴급도 {{ counseling.urgency_level }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                                   {% if counseling.status.name == 'COMPLETED' %}bg-green-100 text-green-800
+                                                   {% elif counseling.status.name == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
+                                                   {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                            {{ counseling.get_status_display() }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 날짜 정보 -->
+                                <div class="lg:col-span-2">
+                                    <div class="text-sm text-gray-600">등록일</div>
+                                    <div class="text-lg font-semibold text-gray-800">{{ counseling.created_date.strftime('%Y-%m-%d') }}</div>
+                                    <div class="text-gray-600">{{ counseling.created_date.strftime('%H:%M') }}</div>
+                                    <div class="text-sm text-gray-600 mt-2">최종 수정</div>
+                                    <div class="text-gray-600">{{ counseling.updated_date.strftime('%Y-%m-%d %H:%M') }}</div>
+                                </div>
+
+                                <!-- 액션 버튼 -->
+                                <div class="lg:col-span-2">
+                                    <div class="flex flex-col gap-2">
+                                        <a href="{{ url_for('professor_view_counseling', counseling_id=counseling.id) }}" 
+                                           class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-center rounded-xl transition-all duration-200">
+                                            <i class="fas fa-eye mr-1"></i>보기
+                                        </a>
+                                        {% if counseling.status.name == 'RECEIVED' %}
+                                        <button type="button" 
+                                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200" 
+                                                onclick="quickUpdateStatus({{ counseling.id }}, 'IN_PROGRESS')">
+                                            <i class="fas fa-play mr-1"></i>시작
+                                        </button>
+                                        {% elif counseling.status.name == 'IN_PROGRESS' %}
+                                        <button type="button" 
+                                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl transition-all duration-200" 
+                                                onclick="quickUpdateStatus({{ counseling.id }}, 'COMPLETED')">
+                                            <i class="fas fa-check mr-1"></i>완료
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                {% if counselings.pages > 1 %}
+                <div class="flex justify-center mt-8">
+                    <nav class="flex space-x-2">
+                        {% if counselings.has_prev %}
+                        <a href="{{ url_for('professor_counselings', page=counselings.prev_num, **current_filters) }}" 
+                           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all duration-200">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% for page_num in counselings.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num != counselings.page %}
+                                <a href="{{ url_for('professor_counselings', page=page_num, **current_filters) }}" 
+                                   class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all duration-200">
+                                    {{ page_num }}
+                                </a>
+                                {% else %}
+                                <span class="px-4 py-2 bg-green-600 text-white rounded-xl">{{ page_num }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="px-4 py-2">…</span>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if counselings.has_next %}
+                        <a href="{{ url_for('professor_counselings', page=counselings.next_num, **current_filters) }}" 
+                           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all duration-200">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-inbox text-6xl text-gray-400 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-600 mb-2">상담이 없습니다</h3>
+                    <p class="text-lg text-gray-500">현재 조건에 맞는 상담이 없습니다.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 상태 업데이트 모달 -->
+<div id="updateModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-3xl bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">상담 상태 변경</h3>
+            <p class="text-sm text-gray-500 mb-6">상담 상태를 변경하시겠습니까?</p>
+            <div class="flex justify-center gap-4">
+                <button type="button" 
+                        class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all duration-200" 
+                        onclick="closeModal()">
+                    취소
+                </button>
+                <button type="button" 
+                        class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all duration-200" 
+                        id="confirmUpdate">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentCounselingId = null;
+let currentStatus = null;
+
+function quickUpdateStatus(counselingId, status) {
+    currentCounselingId = counselingId;
+    currentStatus = status;
+    document.getElementById('updateModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('updateModal').classList.add('hidden');
+    currentCounselingId = null;
+    currentStatus = null;
+}
+
+document.getElementById('confirmUpdate').addEventListener('click', function() {
+    if (currentCounselingId && currentStatus) {
+        fetch(`/professor/counseling/${currentCounselingId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: currentStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('상태 업데이트에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류가 발생했습니다.');
+        });
+    }
+    closeModal();
+});
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('updateModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %} 

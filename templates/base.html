@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}원광대학교 상담 시스템{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            important: true,
+            corePlugins: {
+                preflight: false
+            },
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'noto': ['Noto Sans KR', 'sans-serif']
+                    },
+                    colors: {
+                        'wku-primary': '#0066cc',
+                        'wku-primary-dark': '#004d99',
+                        'wku-primary-light': '#3385d6',
+                        'wku-secondary': '#f39c12',
+                        'wku-accent': '#e74c3c',
+                        'wku-success': '#27ae60',
+                        'wku-warning': '#f39c12',
+                        'wku-error': '#e74c3c',
+                        'wku-info': '#17a2b8',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 구글 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- WKU 커스텀 스타일 -->
+    <style>
+        :root {
+            --wku-primary: #0066cc;
+            --wku-primary-dark: #004d99;
+            --wku-primary-light: #3385d6;
+            --wku-secondary: #f39c12;
+            --wku-accent: #e74c3c;
+            --wku-success: #27ae60;
+            --wku-warning: #f39c12;
+            --wku-error: #e74c3c;
+            --wku-info: #17a2b8;
+            
+            /* Bootstrap 커스텀 색상 오버라이드 */
+            --bs-primary: #0066cc;
+            --bs-primary-rgb: 0, 102, 204;
+            --bs-secondary: #f39c12;
+            --bs-secondary-rgb: 243, 156, 18;
+            --bs-success: #27ae60;
+            --bs-success-rgb: 39, 174, 96;
+            --bs-danger: #e74c3c;
+            --bs-danger-rgb: 231, 76, 60;
+            --bs-warning: #f39c12;
+            --bs-warning-rgb: 243, 156, 18;
+            --bs-info: #17a2b8;
+            --bs-info-rgb: 23, 162, 184;
+        }
+        
+        * {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background-color: #f8fafc;
+            line-height: 1.6;
+        }
+        
+        /* WKU 브랜드 색상 유틸리티 클래스 */
+        .bg-wku-primary { background-color: var(--wku-primary) !important; }
+        .bg-wku-primary-dark { background-color: var(--wku-primary-dark) !important; }
+        .bg-wku-primary-light { background-color: var(--wku-primary-light) !important; }
+        .bg-wku-secondary { background-color: var(--wku-secondary) !important; }
+        .bg-wku-accent { background-color: var(--wku-accent) !important; }
+        .bg-wku-success { background-color: var(--wku-success) !important; }
+        .bg-wku-warning { background-color: var(--wku-warning) !important; }
+        .bg-wku-error { background-color: var(--wku-error) !important; }
+        
+        .text-wku-primary { color: var(--wku-primary) !important; }
+        .text-wku-primary-dark { color: var(--wku-primary-dark) !important; }
+        .text-wku-primary-light { color: var(--wku-primary-light) !important; }
+        .text-wku-secondary { color: var(--wku-secondary) !important; }
+        .text-wku-accent { color: var(--wku-accent) !important; }
+        .text-wku-success { color: var(--wku-success) !important; }
+        .text-wku-warning { color: var(--wku-warning) !important; }
+        .text-wku-error { color: var(--wku-error) !important; }
+        
+        .border-wku-primary { border-color: var(--wku-primary) !important; }
+        .border-wku-secondary { border-color: var(--wku-secondary) !important; }
+        .border-wku-accent { border-color: var(--wku-accent) !important; }
+        .border-wku-success { border-color: var(--wku-success) !important; }
+        .border-wku-warning { border-color: var(--wku-warning) !important; }
+        .border-wku-error { border-color: var(--wku-error) !important; }
+        
+        /* WKU 버튼 스타일 */
+        .btn-wku-primary {
+            background-color: var(--wku-primary);
+            border-color: var(--wku-primary);
+            color: white;
+        }
+        
+        .btn-wku-primary:hover,
+        .btn-wku-primary:focus {
+            background-color: var(--wku-primary-dark);
+            border-color: var(--wku-primary-dark);
+            color: white;
+        }
+        
+        .btn-wku-secondary {
+            background-color: var(--wku-secondary);
+            border-color: var(--wku-secondary);
+            color: white;
+        }
+        
+        .btn-wku-secondary:hover,
+        .btn-wku-secondary:focus {
+            background-color: #e67e22;
+            border-color: #e67e22;
+            color: white;
+        }
+        
+        /* 네비게이션 바 스타일 */
+        .navbar-wku {
+            background: linear-gradient(135deg, var(--wku-primary) 0%, var(--wku-primary-dark) 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-wku .navbar-brand,
+        .navbar-wku .nav-link {
+            color: white !important;
+        }
+        
+        .navbar-wku .nav-link:hover {
+            color: #f8f9fa !important;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        /* 카드 스타일 개선 */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background-color: var(--wku-primary);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            border-bottom: none;
+        }
+        
+        /* 알림 및 배지 스타일 */
+        .alert-wku-primary {
+            background-color: rgba(0, 102, 204, 0.1);
+            border-color: var(--wku-primary);
+            color: var(--wku-primary-dark);
+        }
+        
+        .badge-wku-primary {
+            background-color: var(--wku-primary);
+            color: white;
+        }
+        
+        .badge-wku-secondary {
+            background-color: var(--wku-secondary);
+            color: white;
+        }
+        
+        /* 테이블 스타일 */
+        .table-wku {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table-wku thead th {
+            background-color: var(--wku-primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        
+        .table-wku tbody tr:hover {
+            background-color: rgba(0, 102, 204, 0.05);
+        }
+        
+        /* 폼 컨트롤 스타일 */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--wku-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+        }
+        
+        /* 사용자 정의 유틸리티 */
+        .text-muted-wku {
+            color: #6c757d !important;
+        }
+        
+        .bg-light-wku {
+            background-color: #f8f9fa !important;
+        }
+        
+        .rounded-wku {
+            border-radius: 12px !important;
+        }
+        
+        /* 애니메이션 */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        /* 반응형 개선 */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* 스크롤바 커스터마이징 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--wku-primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--wku-primary-dark);
+        }
+        
+        /* 로딩 스피너 */
+        .spinner-wku {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--wku-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-wku">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+                <i class="bi bi-mortarboard-fill me-2"></i>원광대학교 상담시스템
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if session.user_id %}
+                        {% if session.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                    <i class="bi bi-speedometer2 me-1"></i>관리자 대시보드
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_counselings') }}">
+                                    <i class="bi bi-chat-dots me-1"></i>상담 관리
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                    <i class="bi bi-people me-1"></i>사용자 관리
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_professor_management') }}">
+                                    <i class="bi bi-person-badge me-1"></i>교수 관리
+                                </a>
+                            </li>
+                        {% elif session.role == 'professor' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('professor_dashboard') }}">
+                                    <i class="bi bi-speedometer2 me-1"></i>교수 대시보드
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('professor_counselings') }}">
+                                    <i class="bi bi-chat-dots me-1"></i>내 상담
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('professor_statistics') }}">
+                                    <i class="bi bi-graph-up me-1"></i>통계
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('index') }}">
+                                    <i class="bi bi-house me-1"></i>홈
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('add_counseling') }}">
+                                    <i class="bi bi-plus-circle me-1"></i>상담 신청
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('manage_counselings') }}">
+                                    <i class="bi bi-list-ul me-1"></i>내 상담
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('search_counselings') }}">
+                                    <i class="bi bi-search me-1"></i>상담 검색
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav ms-auto">
+                    {% if session.user_id %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>{{ session.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                                    <i class="bi bi-person me-2"></i>프로필
+                                </a></li>
+                                {% if session.role == 'student' %}
+                                <li><a class="dropdown-item" href="{{ url_for('user_statistics') }}">
+                                    <i class="bi bi-graph-up me-2"></i>내 통계
+                                </a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>로그아웃
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>로그인
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">
+                                <i class="bi bi-person-plus me-1"></i>회원가입
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="flex-shrink-0">
+        <div class="container-fluid py-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="row">
+                        <div class="col-12">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    
+    <!-- 커스텀 JavaScript -->
+    <script>
+        // Bootstrap 토스트 자동 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl);
+            });
+            
+            // 자동으로 토스트 표시
+            toastList.forEach(function(toast) {
+                toast.show();
+            });
+        });
+        
+        // 네비게이션 활성 상태 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(function(link) {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // 부드러운 스크롤
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        console.log('✅ Bootstrap 5 CSS 프레임워크가 성공적으로 로드되었습니다.');
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

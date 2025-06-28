@@ -1,0 +1,401 @@
+/* 원광대학교 컴퓨터소프트웨어공학과 상담관리 시스템 - 커스텀 스타일 */
+
+/* 기본 스타일 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f8f9fa;
+    line-height: 1.6;
+}
+
+/* 헤더 스타일 */
+.header {
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    color: #007bff;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 네비게이션 스타일 */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 0.5rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff !important;
+    transform: translateY(-1px);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* 원광대학교 브랜드 컬러 */
+.wku-primary {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+
+.wku-text {
+    color: #1e3a8a;
+}
+
+/* 카드 스타일 */
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    font-weight: 600;
+}
+
+.card-header h2, .card-header h3, .card-header h4 {
+    color: #495057;
+}
+
+/* 상담 분야별 색상 */
+.category-am {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.category-cl {
+    background-color: #f3e5f5;
+    border-left: 4px solid #9c27b0;
+}
+
+.category-cc {
+    background-color: #e8f5e8;
+    border-left: 4px solid #4caf50;
+}
+
+.category-ot {
+    background-color: #fff3e0;
+    border-left: 4px solid #ff9800;
+}
+
+/* 상담 상태별 배지 색상 */
+.badge {
+    font-size: 0.75em;
+}
+
+.badge-academic { background-color: #0d6efd; }
+.badge-campus { background-color: #198754; }
+.badge-career { background-color: #fd7e14; }
+.badge-other { background-color: #6c757d; }
+
+.badge-received { background-color: #0dcaf0; }
+.badge-in-progress { background-color: #ffc107; color: #000; }
+.badge-completed { background-color: #198754; }
+.badge-pending { background-color: #dc3545; }
+
+/* 긴급도별 색상 */
+.urgency-high { color: #dc3545; font-weight: bold; }
+.urgency-medium { color: #fd7e14; font-weight: bold; }
+.urgency-low { color: #6c757d; }
+
+/* 폼 스타일 */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.section-header {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.section-header h4 {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* 버튼 스타일 */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+}
+
+/* 테이블 스타일 */
+.table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.075);
+}
+
+/* 통계 카드 스타일 */
+.stats-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #007bff;
+}
+
+/* 알림 스타일 */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+/* 점보트론 스타일 */
+.jumbotron {
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* 검색 및 필터 스타일 */
+.search-container {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 2rem;
+}
+
+/* 로딩 스피너 */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 회원가입/로그인 페이지 스타일 */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.auth-body {
+    padding: 2rem;
+}
+
+/* 학교 로고 스타일 */
+.university-logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* 푸터 스타일 */
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 2rem 0;
+    margin-top: 3rem;
+}
+
+.footer a {
+    color: #adb5bd;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #ffffff;
+}
+
+/* 프린트 스타일 */
+@media print {
+    .navbar, .btn, .footer {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}
+
+/* 교수 전용 스타일 */
+.professor-badge {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #000;
+    font-weight: bold;
+}
+
+.professor-card {
+    border-left: 4px solid #ffd700;
+}
+
+.urgent-counseling {
+    border-left: 4px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* 통계 카드 */
+.stat-card {
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+/* 필터 섹션 */
+.filter-section {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* 검색 결과 하이라이트 */
+.search-highlight {
+    background-color: #fff3cd;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}

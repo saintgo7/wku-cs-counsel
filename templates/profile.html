@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}내 프로필 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8 bg-gradient-to-br from-blue-50 to-purple-50">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-6">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-user-circle text-blue-600 mr-4"></i>내 프로필
+                    </h1>
+                    <p class="text-xl text-gray-600">개인 정보와 상담 활동을 확인하고 관리하세요</p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{{ url_for('index') }}" 
+                       class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-2xl font-semibold transition-colors duration-200 flex items-center">
+                        <i class="fas fa-home mr-2"></i>홈으로
+                    </a>
+                    <button onclick="editProfile()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-semibold transition-colors duration-200 flex items-center">
+                        <i class="fas fa-edit mr-2"></i>정보 수정
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 프로필 카드 -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-3xl shadow-2xl p-8 sticky top-8">
+                    <!-- 프로필 이미지 -->
+                    <div class="text-center mb-8">
+                        <div class="mx-auto mb-6 w-32 h-32 flex items-center justify-center bg-blue-100 rounded-full">
+                            <i class="fas fa-user text-blue-600 text-6xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ session.get('name', '사용자') }}</h2>
+                        <p class="text-xl text-gray-600 mb-1">{{ session.get('student_id', 'N/A') }}</p>
+                        <p class="text-gray-500">컴퓨터소프트웨어공학과</p>
+                    </div>
+
+                    <!-- 상태 정보 -->
+                    <div class="mb-8">
+                        <div class="bg-blue-50 rounded-2xl p-4 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-check text-blue-600 text-2xl mr-4"></i>
+                                    <span class="font-semibold text-gray-800">가입일</span>
+                                </div>
+                                <span class="text-gray-600">{{ session.get('join_date', '2024-01-01') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-2xl p-4 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-comments text-green-600 text-2xl mr-4"></i>
+                                    <span class="font-semibold text-gray-800">총 상담 건수</span>
+                                </div>
+                                <span class="text-xl font-bold text-green-600">{{ total_counselings or 0 }}건</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-2xl p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-purple-600 text-2xl mr-4"></i>
+                                    <span class="font-semibold text-gray-800">활동 점수</span>
+                                </div>
+                                <span class="text-xl font-bold text-purple-600">{{ activity_score or 0 }}점</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 연락처 정보 -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-address-card mr-2"></i>연락처 정보
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-gray-500 mr-4 w-6"></i>
+                                <span class="text-gray-800">{{ session.get('email', '이메일 없음') }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-phone text-gray-500 mr-4 w-6"></i>
+                                <span class="text-gray-800">{{ session.get('phone', '전화번호 없음') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 -->
+            <div class="lg:col-span-2">
+                <!-- 최근 상담 활동 -->
+                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-3xl font-bold text-gray-800">
+                            <i class="fas fa-clock text-blue-600 mr-4"></i>최근 상담 활동
+                        </h3>
+                        <a href="{{ url_for('manage_counselings') }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition-colors duration-200 flex items-center">
+                            전체보기 <i class="bi bi-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+
+                    {% if recent_counselings %}
+                    <div class="space-y-6">
+                        {% for counseling in recent_counselings[:5] %}
+                        <div class="border-l-4 border-blue-600 bg-blue-50 rounded-2xl">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-grow">
+                                        <div class="flex gap-3 mb-4">
+                                            {% if counseling.counseling_category.value == 'ACADEMIC' %}
+                                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">📚 학업</span>
+                                            {% elif counseling.counseling_category.value == 'CAREER' %}
+                                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">🚀 진로</span>
+                                            {% elif counseling.counseling_category.value == 'CAMPUS_LIFE' %}
+                                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">🏫 생활</span>
+                                            {% elif counseling.counseling_category.value == 'PERSONAL' %}
+                                                <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium">💭 개인</span>
+                                            {% endif %}
+                                            
+                                            {% if counseling.status.value == 'PENDING' %}
+                                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">⏳ 대기중</span>
+                                            {% elif counseling.status.value == 'IN_PROGRESS' %}
+                                                <span class="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm font-medium">⚡ 진행중</span>
+                                            {% elif counseling.status.value == 'COMPLETED' %}
+                                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ 완료</span>
+                                            {% endif %}
+                                        </div>
+                                        <h4 class="text-xl font-bold text-gray-800 mb-3">{{ counseling.counseling_title }}</h4>
+                                        <p class="text-gray-600 mb-3">
+                                            {{ counseling.counseling_content[:100] }}{% if counseling.counseling_content|length > 100 %}...{% endif %}
+                                        </p>
+                                        <div class="flex items-center text-gray-500">
+                                            <i class="bi bi-calendar mr-2"></i>
+                                            <span>{{ counseling.created_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-6">
+                                        <a href="{{ url_for('view_counseling', counseling_id=counseling.id) }}" 
+                                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors duration-200 flex items-center">
+                                            <i class="bi bi-eye mr-2"></i>보기
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-16">
+                        <div class="text-gray-400 mb-6 text-6xl">📝</div>
+                        <h4 class="text-3xl font-bold text-gray-600 mb-4">아직 상담 내역이 없습니다</h4>
+                        <p class="text-xl text-gray-500 mb-8">첫 상담을 신청해보세요!</p>
+                        <a href="{{ url_for('add_counseling') }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-semibold transition-colors duration-200 inline-flex items-center">
+                            <i class="bi bi-plus-lg mr-3"></i>상담 신청하기
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 상담 통계 -->
+                <div class="bg-white rounded-3xl shadow-2xl p-8">
+                    <h3 class="text-3xl font-bold text-gray-800 mb-8">
+                        <i class="bi bi-pie-chart text-purple-600 mr-4"></i>나의 상담 통계
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- 카테고리별 통계 -->
+                        <div class="bg-blue-50 rounded-2xl p-6 h-full">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6">
+                                <i class="bi bi-tags mr-2"></i>분야별 상담
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-blue-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">학업 상담</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-blue-600">{{ category_stats.get('ACADEMIC', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-green-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">진로 상담</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-green-600">{{ category_stats.get('CAREER', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-purple-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">캠퍼스 생활</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-purple-600">{{ category_stats.get('CAMPUS_LIFE', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-pink-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">개인 상담</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-pink-600">{{ category_stats.get('PERSONAL', 0) }}건</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 상태별 통계 -->
+                        <div class="bg-green-50 rounded-2xl p-6 h-full">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6">
+                                <i class="bi bi-graph-up mr-2"></i>상태별 통계
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-yellow-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">대기중</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-yellow-600">{{ status_stats.get('PENDING', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-cyan-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">진행중</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-cyan-600">{{ status_stats.get('IN_PROGRESS', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-green-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">완료</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-green-600">{{ status_stats.get('COMPLETED', 0) }}건</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <span class="bg-red-600 rounded-full mr-4 w-4 h-4"></span>
+                                        <span class="text-gray-800 font-medium">취소</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-red-600">{{ status_stats.get('CANCELLED', 0) }}건</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editProfile() {
+    alert('프로필 수정 기능은 추후 개발 예정입니다.');
+}
+</script>
+{% endblock %} 

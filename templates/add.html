@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}상담 신청 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="text-center mb-8">
+            <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-plus text-4xl text-blue-600"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">새 상담 신청</h1>
+            <p class="text-xl text-gray-600">원광대학교 컴퓨터소프트웨어공학과 상담시스템</p>
+        </div>
+
+        <!-- 상담 신청 폼 -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+            <div class="bg-blue-50 px-8 py-6 border-b border-blue-100">
+                <h2 class="text-2xl font-bold text-blue-900 flex items-center">
+                    <i class="fas fa-edit mr-3 text-blue-600"></i>상담 신청서
+                </h2>
+                <p class="text-base text-blue-700 mt-2">모든 필수 항목(*)을 작성해주세요</p>
+            </div>
+            
+            <div class="p-8">
+                <form method="POST" action="{{ url_for('add_counseling') }}" class="space-y-6">
+                    <!-- 기본 정보 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="student_name" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>이름 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                   id="student_name" 
+                                   name="student_name" 
+                                   value="{{ session.get('name', '') }}" 
+                                   placeholder="이름을 입력하세요"
+                                   required>
+                        </div>
+                        
+                        <div>
+                            <label for="grade" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-graduation-cap mr-2 text-green-600"></i>학년
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                    id="grade" 
+                                    name="grade">
+                                <option value="">학년을 선택하세요</option>
+                                <option value="1">1학년</option>
+                                <option value="2">2학년</option>
+                                <option value="3">3학년</option>
+                                <option value="4">4학년</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- 연락처 -->
+                    <div>
+                        <label for="contact" class="block text-lg font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-phone mr-2 text-purple-600"></i>연락처
+                        </label>
+                        <input type="tel" 
+                               class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                               id="contact" 
+                               name="contact" 
+                               placeholder="010-1234-5678">
+                    </div>
+                    
+                    <!-- 상담 분야 및 긴급도 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="counseling_category" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-tags mr-2 text-orange-600"></i>상담 분야 <span class="text-red-600">*</span>
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                    id="counseling_category" 
+                                    name="counseling_category" 
+                                    required>
+                                <option value="">상담 분야를 선택하세요</option>
+                                <option value="ACADEMIC">📚 학업 상담</option>
+                                <option value="CAREER">🎯 진로 상담</option>
+                                <option value="CAMPUS_LIFE">🏫 캠퍼스 생활</option>
+                                <option value="PERSONAL">💭 개인 상담</option>
+                                <option value="OTHER">❓ 기타</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="urgency_level" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>긴급도
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                    id="urgency_level" 
+                                    name="urgency_level">
+                                <option value="1">1 - 낮음 😌</option>
+                                <option value="2">2 - 보통 🙂</option>
+                                <option value="3" selected>3 - 중간 😐</option>
+                                <option value="4">4 - 높음 😰</option>
+                                <option value="5">5 - 매우 높음 🚨</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- 상담 제목 -->
+                    <div>
+                        <label for="counseling_title" class="block text-lg font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-heading mr-2 text-indigo-600"></i>상담 제목 <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" 
+                               class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                               id="counseling_title" 
+                               name="counseling_title" 
+                               placeholder="상담 제목을 간단히 입력하세요 (예: 진로 선택 고민, 학습 방법 문의)"
+                               required 
+                               maxlength="200">
+                        <div class="mt-2 flex justify-between items-center">
+                            <p class="text-sm text-gray-500">
+                                <i class="fas fa-lightbulb mr-1"></i>명확하고 구체적인 제목을 작성해주세요
+                            </p>
+                            <span class="char-count text-sm text-gray-400">0/200</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 상담 내용 -->
+                    <div>
+                        <label for="counseling_content" class="block text-lg font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-edit mr-2 text-teal-600"></i>상담 내용 <span class="text-red-600">*</span>
+                        </label>
+                        <textarea class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" 
+                                  id="counseling_content" 
+                                  name="counseling_content" 
+                                  rows="8" 
+                                  placeholder="상담하고 싶은 내용을 자세히 작성해주세요.
+
+예시:
+- 현재 상황 설명
+- 어떤 도움이 필요한지
+- 궁금한 점이나 고민
+- 원하는 결과나 목표"
+                                  required></textarea>
+                        <div class="mt-3 bg-blue-50 rounded-xl p-4">
+                            <p class="text-base text-blue-800 flex items-start">
+                                <i class="fas fa-info-circle mr-2 mt-1 text-blue-600"></i>
+                                <span>구체적으로 작성해주실수록 더 정확하고 도움이 되는 상담을 받으실 수 있습니다. 개인정보는 안전하게 보호됩니다.</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- 제출 버튼 -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6">
+                        <a href="{{ url_for('index') }}" 
+                           class="bg-gray-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-600 transition-colors duration-200 text-center">
+                            <i class="fas fa-arrow-left mr-2"></i>취소
+                        </a>
+                        <button type="submit" 
+                                class="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+                            <i class="fas fa-paper-plane mr-2"></i>상담 신청하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 상담 안내 -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 px-8 py-6 border-b border-gray-100">
+                <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-blue-600"></i>상담 신청 안내
+                </h3>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 처리 시간 -->
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                            <i class="fas fa-clock mr-3 text-blue-600"></i>처리 시간
+                        </h4>
+                        <ul class="space-y-2 text-base text-blue-800">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-600"></i>
+                                일반 상담: 1-2일 내 답변
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-bolt mr-2 text-red-600"></i>
+                                긴급 상담: 당일 답변
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 개인정보 보호 -->
+                    <div class="bg-green-50 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-green-900 mb-4 flex items-center">
+                            <i class="fas fa-shield-alt mr-3 text-green-600"></i>개인정보 보호
+                        </h4>
+                        <ul class="space-y-2 text-base text-green-800">
+                            <li class="flex items-center">
+                                <i class="fas fa-lock mr-2 text-green-600"></i>
+                                상담 내용은 비공개 처리
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-user-shield mr-2 text-green-600"></i>
+                                담당 교수만 열람 가능
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <!-- 상담 분야 -->
+                    <div class="bg-purple-50 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-purple-900 mb-4 flex items-center">
+                            <i class="fas fa-list-alt mr-3 text-purple-600"></i>상담 분야 안내
+                        </h4>
+                        <div class="space-y-3 text-base text-purple-800">
+                            <div class="flex items-start">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg text-sm font-semibold mr-3 mt-0.5">학업</span>
+                                <span>학습 방법, 성적 관리, 수강 신청</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-lg text-sm font-semibold mr-3 mt-0.5">진로</span>
+                                <span>취업 준비, 진학, 자격증, 인턴십</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-lg text-sm font-semibold mr-3 mt-0.5">생활</span>
+                                <span>교우관계, 동아리, 적응 문제</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded-lg text-sm font-semibold mr-3 mt-0.5">개인</span>
+                                <span>개인적 고민, 스트레스 관리</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 긴급 연락처 -->
+                    <div class="bg-red-50 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-red-900 mb-4 flex items-center">
+                            <i class="fas fa-phone mr-3 text-red-600"></i>긴급 연락처
+                        </h4>
+                        <div class="space-y-3 text-base text-red-800">
+                            <div class="flex items-center justify-between bg-white rounded-lg p-3">
+                                <span class="font-semibold">학과사무실</span>
+                                <a href="tel:063-850-6780" class="text-blue-600 hover:text-blue-800 font-bold">
+                                    063-850-6780
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between bg-white rounded-lg p-3">
+                                <span class="font-semibold">학생상담센터</span>
+                                <a href="tel:063-850-5050" class="text-blue-600 hover:text-blue-800 font-bold">
+                                    063-850-5050
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-white rounded-lg p-3">
+                            <p class="text-sm text-red-700 flex items-start">
+                                <i class="fas fa-exclamation-triangle mr-2 mt-0.5 text-red-600"></i>
+                                <span>위급한 상황이거나 즉시 도움이 필요한 경우 위 번호로 직접 연락주세요.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 긴급도 표시 업데이트
+    const urgencySelect = document.getElementById('urgency_level');
+    urgencySelect.addEventListener('change', function() {
+        const level = parseInt(this.value);
+        const colors = ['bg-gray-100', 'bg-blue-100', 'bg-yellow-100', 'bg-orange-100', 'bg-red-100'];
+        const textColors = ['text-gray-800', 'text-blue-800', 'text-yellow-800', 'text-orange-800', 'text-red-800'];
+        const labels = ['낮음', '보통', '중간', '높음', '매우 높음'];
+        
+        // 시각적 표시 업데이트
+        this.className = this.className.replace(/bg-\w+-100/g, '') + ' ' + colors[level-1];
+        console.log(`긴급도 ${level} (${labels[level-1]}) 선택됨`);
+    });
+    
+    // 글자 수 카운터
+    const titleInput = document.getElementById('counseling_title');
+    const contentTextarea = document.getElementById('counseling_content');
+    
+    function updateCharCount(element, maxLength) {
+        const current = element.value.length;
+        const remaining = maxLength - current;
+        
+        // 글자 수 표시 요소 업데이트
+        const countElement = element.parentElement.querySelector('.char-count');
+        if (countElement) {
+            countElement.textContent = `${current}/${maxLength}`;
+            if (remaining < 20) {
+                countElement.className = 'char-count text-sm text-red-500 font-semibold';
+            } else {
+                countElement.className = 'char-count text-sm text-gray-400';
+            }
+        }
+    }
+    
+    titleInput.addEventListener('input', () => updateCharCount(titleInput, 200));
+    
+    // 폼 제출 전 확인
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const title = titleInput.value.trim();
+        const content = contentTextarea.value.trim();
+        const category = document.getElementById('counseling_category').value;
+        
+        if (!title || !content || !category) {
+            e.preventDefault();
+            alert('필수 항목을 모두 입력해주세요.');
+            return;
+        }
+        
+        if (title.length < 5) {
+            e.preventDefault();
+            alert('제목을 5자 이상 입력해주세요.');
+            titleInput.focus();
+            return;
+        }
+        
+        if (content.length < 20) {
+            e.preventDefault();
+            alert('상담 내용을 20자 이상 자세히 작성해주세요.');
+            contentTextarea.focus();
+            return;
+        }
+        
+        // 제출 확인
+        if (!confirm('상담 신청을 제출하시겠습니까?')) {
+            e.preventDefault();
+        }
+    });
+    
+    // 실시간 입력 도움말
+    const categorySelect = document.getElementById('counseling_category');
+    categorySelect.addEventListener('change', function() {
+        const examples = {
+            'ACADEMIC': '예: 프로그래밍 언어 학습 방법, 전공 과목 이해, 과제 도움',
+            'CAREER': '예: 취업 준비 방법, 진로 선택, 자격증 추천, 대학원 진학',
+            'CAMPUS_LIFE': '예: 동아리 활동, 교우관계, 학교 적응, 생활 고민',
+            'PERSONAL': '예: 개인적 고민, 스트레스 관리, 심리적 어려움',
+            'OTHER': '예: 기타 문의사항, 학과 관련 질문'
+        };
+        
+        const placeholder = examples[this.value] || '상담하고 싶은 내용을 자세히 작성해주세요.';
+        contentTextarea.placeholder = placeholder + '\n\n상황을 구체적으로 설명해주시면 더 도움이 되는 상담을 받으실 수 있습니다.';
+    });
+});
+</script>
+{% endblock %}

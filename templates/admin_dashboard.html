@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}관리자 대시보드{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
+    <div class="container mx-auto px-6 py-8">
+        <!-- 헤더 -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-5xl font-bold text-blue-600 mb-3">
+                        관리자 대시보드
+                    </h1>
+                    <p class="text-gray-600 text-xl">원광대학교 컴퓨터소프트웨어공학과 상담 시스템</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 mb-1">마지막 업데이트</p>
+                    <p class="text-xl font-semibold text-gray-800">{{ current_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <!-- 총 상담 수 -->
+            <div class="bg-white rounded-2xl shadow-xl border-l-4 border-blue-600 p-6 h-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs uppercase font-medium text-gray-500 mb-2">총 상담</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">{{ total_counselings }}</h3>
+                        <p class="text-sm text-blue-600">
+                            <i class="fas fa-comments mr-2"></i>전체 상담 건수
+                        </p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-4">
+                        <i class="fas fa-comments text-3xl text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대기 중 상담 -->
+            <div class="bg-white rounded-2xl shadow-xl border-l-4 border-yellow-600 p-6 h-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs uppercase font-medium text-gray-500 mb-2">대기 중</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">{{ pending_counselings }}</h3>
+                        <p class="text-sm text-yellow-600">
+                            <i class="fas fa-clock mr-2"></i>처리 대기
+                        </p>
+                    </div>
+                    <div class="bg-yellow-100 rounded-full p-4">
+                        <i class="fas fa-clock text-3xl text-yellow-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 완료된 상담 -->
+            <div class="bg-white rounded-2xl shadow-xl border-l-4 border-green-600 p-6 h-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs uppercase font-medium text-gray-500 mb-2">완료</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">{{ completed_counselings }}</h3>
+                        <p class="text-sm text-green-600">
+                            <i class="fas fa-check-circle mr-2"></i>처리 완료
+                        </p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-4">
+                        <i class="fas fa-check-circle text-3xl text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 등록 사용자 -->
+            <div class="bg-white rounded-2xl shadow-xl border-l-4 border-cyan-600 p-6 h-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs uppercase font-medium text-gray-500 mb-2">사용자</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">{{ total_users }}</h3>
+                        <p class="text-sm text-cyan-600">
+                            <i class="fas fa-users mr-2"></i>등록된 사용자
+                        </p>
+                    </div>
+                    <div class="bg-cyan-100 rounded-full p-4">
+                        <i class="fas fa-users text-3xl text-cyan-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 최근 상담 및 사용자 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- 최근 상담 목록 -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 h-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-comments text-green-600 mr-4"></i>최근 상담
+                    </h4>
+                    <a href="{{ url_for('admin_counselings') }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow-lg transition-colors">
+                        전체보기
+                    </a>
+                </div>
+                
+                {% if recent_counselings %}
+                    <div class="space-y-4">
+                        {% for counseling in recent_counselings[:5] %}
+                        <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-green-600">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-grow">
+                                    <h6 class="font-semibold text-gray-800 mb-2">
+                                        {{ counseling.counseling_title[:30] }}
+                                        {% if counseling.counseling_title|length > 30 %}...{% endif %}
+                                    </h6>
+                                    <p class="text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-user mr-2"></i>{{ counseling.student_name }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        <i class="fas fa-calendar mr-2"></i>{{ counseling.created_date.strftime('%Y-%m-%d %H:%M') }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium
+                                    {% if counseling.get_status_class() == 'success' %}bg-green-100 text-green-600
+                                    {% elif counseling.get_status_class() == 'warning' %}bg-yellow-100 text-yellow-600
+                                    {% elif counseling.get_status_class() == 'danger' %}bg-red-100 text-red-600
+                                    {% else %}bg-blue-100 text-blue-600{% endif %}">
+                                    {{ counseling.get_status_display() }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-comments text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500 text-xl">등록된 상담이 없습니다.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 최근 등록 사용자 -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 h-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-user-plus text-blue-600 mr-4"></i>최근 등록 사용자
+                    </h4>
+                    <a href="{{ url_for('admin_users') }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-lg transition-colors">
+                        전체보기
+                    </a>
+                </div>
+                
+                {% if recent_users %}
+                    <div class="space-y-4">
+                        {% for user in recent_users %}
+                        <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-blue-600">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h6 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                        {{ user.name }}
+                                        <span class="ml-3 px-2 py-1 rounded-full text-xs font-medium
+                                            {% if user.role.value == '관리자' %}bg-red-100 text-red-600
+                                            {% elif user.role.value == '교수' %}bg-yellow-100 text-yellow-600
+                                            {% else %}bg-blue-100 text-blue-600{% endif %}">
+                                            {{ user.role.value }}
+                                        </span>
+                                    </h6>
+                                    <p class="text-sm text-gray-600">
+                                        <i class="fas fa-id-badge mr-2"></i>{{ user.student_id }} | 
+                                        <i class="fas fa-envelope mr-2"></i>{{ user.email }}
+                                    </p>
+                                </div>
+                                <span class="text-sm text-gray-500">
+                                    {{ user.created_date.strftime('%m/%d') }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-users text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500 text-xl">등록된 사용자가 없습니다.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 분야별 상담 통계와 긴급 알림 -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+            <!-- 분야별 상담 통계 -->
+            <div class="xl:col-span-2 bg-white rounded-2xl shadow-xl p-8">
+                <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-pie text-blue-600 mr-4"></i>분야별 상담 통계
+                </h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for category, count in category_stats.items() %}
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-semibold text-gray-800">{{ category }}</span>
+                            <span class="text-sm font-medium text-gray-600">{{ count }}건</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full
+                                {% if loop.index0 % 4 == 0 %}bg-blue-600
+                                {% elif loop.index0 % 4 == 1 %}bg-green-600
+                                {% elif loop.index0 % 4 == 2 %}bg-cyan-600
+                                {% else %}bg-yellow-600{% endif %}"
+                                 style="width: {{ (count / total_counselings * 100) if total_counselings > 0 else 0 }}%">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 긴급 상담 알림 -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 mr-4"></i>긴급 알림
+                </h4>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-600 mr-4 text-xl"></i>
+                            <div>
+                                <h6 class="font-semibold text-red-600 mb-1">긴급 상담</h6>
+                                <p class="text-sm text-red-600">{{ urgent_counselings }}건 대기 중</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-yellow-600 mr-4 text-xl"></i>
+                            <div>
+                                <h6 class="font-semibold text-yellow-600 mb-1">장기 미처리</h6>
+                                <p class="text-sm text-yellow-600">7일 이상 {{ long_pending }}건</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 빠른 액션 버튼 -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-tools text-gray-600 mr-4"></i>빠른 관리 메뉴
+            </h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="{{ url_for('admin_users') }}" 
+                   class="group">
+                    <div class="bg-blue-50 text-center h-full rounded-xl p-6 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                        <div class="bg-blue-600 rounded-full inline-flex items-center justify-center mb-4 w-16 h-16">
+                            <i class="fas fa-users text-2xl text-white"></i>
+                        </div>
+                        <h5 class="text-lg font-bold text-gray-800 mb-2">사용자 관리</h5>
+                        <p class="text-sm text-gray-600">사용자 등록 및 권한 관리</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('admin_counselings') }}" 
+                   class="group">
+                    <div class="bg-green-50 text-center h-full rounded-xl p-6 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                        <div class="bg-green-600 rounded-full inline-flex items-center justify-center mb-4 w-16 h-16">
+                            <i class="fas fa-comments text-2xl text-white"></i>
+                        </div>
+                        <h5 class="text-lg font-bold text-gray-800 mb-2">상담 관리</h5>
+                        <p class="text-sm text-gray-600">상담 내역 조회 및 관리</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('admin_counselings', urgency=4) }}" 
+                   class="group">
+                    <div class="bg-red-50 text-center h-full rounded-xl p-6 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                        <div class="bg-red-600 rounded-full inline-flex items-center justify-center mb-4 w-16 h-16">
+                            <i class="fas fa-exclamation-triangle text-2xl text-white"></i>
+                        </div>
+                        <h5 class="text-lg font-bold text-gray-800 mb-2">긴급 상담</h5>
+                        <p class="text-sm text-gray-600">긴급 상담 우선 처리</p>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('professor_statistics') }}" 
+                   class="group">
+                    <div class="bg-cyan-50 text-center h-full rounded-xl p-6 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                        <div class="bg-cyan-600 rounded-full inline-flex items-center justify-center mb-4 w-16 h-16">
+                            <i class="fas fa-chart-bar text-2xl text-white"></i>
+                        </div>
+                        <h5 class="text-lg font-bold text-gray-800 mb-2">통계 보기</h5>
+                        <p class="text-sm text-gray-600">상담 통계 및 분석</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 모든 스타일링이 Tailwind CSS로 구현되었습니다 -->
+{% endblock %} 

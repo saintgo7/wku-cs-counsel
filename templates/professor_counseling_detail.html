@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}상담 상세보기 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-user-graduate text-green-600 mr-3"></i>상담 상세보기
+                    </h1>
+                    <p class="text-xl text-gray-600">학생의 상담 내용을 확인하고 답변하세요</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ url_for('professor_dashboard') }}" 
+                       class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>대시보드
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 메인 콘텐츠 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                    <!-- 상담 헤더 -->
+                    <div class="border-b border-gray-200 pb-6 mb-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div class="flex-1">
+                                <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ counseling.counseling_title }}</h2>
+                                <div class="flex flex-wrap gap-3">
+                                    {% if counseling.counseling_category.value == 'ACADEMIC' %}
+                                        <span class="px-4 py-2 bg-blue-100 text-blue-800 text-lg font-semibold rounded-xl">📚 학업 상담</span>
+                                    {% elif counseling.counseling_category.value == 'CAREER' %}
+                                        <span class="px-4 py-2 bg-green-100 text-green-800 text-lg font-semibold rounded-xl">🚀 진로 상담</span>
+                                    {% elif counseling.counseling_category.value == 'CAMPUS_LIFE' %}
+                                        <span class="px-4 py-2 bg-purple-100 text-purple-800 text-lg font-semibold rounded-xl">🏫 캠퍼스 생활</span>
+                                    {% elif counseling.counseling_category.value == 'PERSONAL' %}
+                                        <span class="px-4 py-2 bg-pink-100 text-pink-800 text-lg font-semibold rounded-xl">💭 개인 상담</span>
+                                    {% else %}
+                                        <span class="px-4 py-2 bg-gray-100 text-gray-800 text-lg font-semibold rounded-xl">📋 기타</span>
+                                    {% endif %}
+                                    
+                                    {% if counseling.status.value == 'PENDING' %}
+                                        <span class="px-4 py-2 bg-yellow-100 text-yellow-800 text-lg font-semibold rounded-xl">⏳ 대기중</span>
+                                    {% elif counseling.status.value == 'IN_PROGRESS' %}
+                                        <span class="px-4 py-2 bg-blue-100 text-blue-800 text-lg font-semibold rounded-xl">⚡ 진행중</span>
+                                    {% elif counseling.status.value == 'COMPLETED' %}
+                                        <span class="px-4 py-2 bg-green-100 text-green-800 text-lg font-semibold rounded-xl">✅ 완료</span>
+                                    {% elif counseling.status.value == 'CANCELLED' %}
+                                        <span class="px-4 py-2 bg-red-100 text-red-800 text-lg font-semibold rounded-xl">❌ 취소</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex items-center gap-2 text-2xl text-yellow-500 mb-2">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= counseling.urgency_level %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="text-lg text-gray-600">긴급도 {{ counseling.urgency_level }}/5</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상담 내용 -->
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-edit text-blue-600 mr-2"></i>상담 내용
+                        </h3>
+                        <div class="bg-gray-50 rounded-2xl p-6">
+                            <p class="text-xl text-gray-700 leading-relaxed whitespace-pre-wrap">{{ counseling.counseling_content }}</p>
+                        </div>
+                    </div>
+
+                    <!-- 교수님 답변 -->
+                    {% if counseling.professor_response %}
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-green-700 mb-4">
+                            <i class="fas fa-reply mr-2"></i>내 답변
+                        </h3>
+                        <div class="bg-green-50 border-l-4 border-green-500 rounded-2xl p-6">
+                            <p class="text-xl text-gray-700 leading-relaxed whitespace-pre-wrap mb-4">{{ counseling.professor_response }}</p>
+                            {% if counseling.response_date %}
+                            <div class="flex items-center text-lg text-green-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span>답변일: {{ counseling.response_date.strftime('%Y년 %m월 %d일 %H:%M') }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 답변 작성 폼 -->
+                    {% if not counseling.professor_response or counseling.status.value != 'COMPLETED' %}
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                            <i class="fas fa-pen text-green-600 mr-2"></i>
+                            {% if counseling.professor_response %}답변 수정{% else %}답변 작성{% endif %}
+                        </h3>
+                        
+                        <form action="{{ url_for('professor_respond_counseling', counseling_id=counseling.id) }}" method="post" class="space-y-6">
+                            <div>
+                                <label for="response" class="block text-xl font-semibold text-gray-700 mb-3">
+                                    답변 내용 <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    id="response" 
+                                    name="response" 
+                                    rows="8" 
+                                    required
+                                    class="w-full px-6 py-4 text-xl border-2 border-gray-200 rounded-2xl focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all duration-300 resize-none"
+                                    placeholder="학생에게 도움이 되는 답변을 작성해주세요..."
+                                    oninput="updateCharCount(this)">{{ counseling.professor_response or '' }}</textarea>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span id="charCount" class="text-lg text-gray-500">0자</span>
+                                    <span class="text-lg text-gray-400">최소 10자 이상 작성해주세요</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-green-50 rounded-2xl p-6">
+                                <h4 class="text-xl font-semibold text-green-800 mb-3">
+                                    <i class="fas fa-lightbulb mr-2"></i>답변 작성 가이드
+                                </h4>
+                                <ul class="text-lg text-green-700 space-y-2">
+                                    <li>• 학생의 상황을 공감하며 시작하세요</li>
+                                    <li>• 구체적이고 실용적인 조언을 제공하세요</li>
+                                    <li>• 필요시 추가 상담이나 자료를 안내하세요</li>
+                                    <li>• 격려와 응원의 메시지를 포함하세요</li>
+                                </ul>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="mark_completed" value="1" 
+                                               class="w-5 h-5 text-green-600 border-2 border-gray-300 rounded focus:ring-green-500">
+                                        <span class="ml-3 text-lg text-gray-700">답변 완료로 표시</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <button type="button" onclick="saveDraft()" 
+                                            class="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white text-xl font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                        <i class="fas fa-save mr-2"></i>임시저장
+                                    </button>
+                                    <button type="submit" 
+                                            class="px-8 py-4 bg-green-600 hover:bg-green-700 text-white text-xl font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                        <i class="fas fa-paper-plane mr-2"></i>답변 전송
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <!-- 액션 버튼 -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
+                        <a href="{{ url_for('professor_dashboard') }}" 
+                           class="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white text-xl font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-arrow-left mr-2"></i>대시보드
+                        </a>
+                        
+                        <div class="flex gap-3">
+                            {% if counseling.status.value == 'COMPLETED' %}
+                                <button onclick="reopenCounseling({{ counseling.id }})" 
+                                        class="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-white text-xl font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    <i class="fas fa-redo mr-2"></i>재오픈
+                                </button>
+                            {% endif %}
+                            
+                            <button onclick="printCounseling()" 
+                                    class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xl font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                <i class="fas fa-print mr-2"></i>인쇄
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사이드바 -->
+            <div class="lg:col-span-1">
+                <!-- 학생 정보 -->
+                <div class="bg-white rounded-3xl shadow-2xl p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-user text-blue-600 mr-2"></i>학생 정보
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-4 bg-gray-50 rounded-xl">
+                            <i class="fas fa-user-circle text-2xl text-blue-600 mr-4"></i>
+                            <div>
+                                <p class="text-lg text-gray-600">이름</p>
+                                <p class="text-xl font-bold text-gray-800">{{ counseling.student_name }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-gray-50 rounded-xl">
+                            <i class="fas fa-id-card text-2xl text-green-600 mr-4"></i>
+                            <div>
+                                <p class="text-lg text-gray-600">학번</p>
+                                <p class="text-xl font-bold text-gray-800">{{ counseling.student_id }}</p>
+                            </div>
+                        </div>
+                        {% if counseling.grade %}
+                        <div class="flex items-center p-4 bg-gray-50 rounded-xl">
+                            <i class="fas fa-graduation-cap text-2xl text-purple-600 mr-4"></i>
+                            <div>
+                                <p class="text-lg text-gray-600">학년</p>
+                                <p class="text-xl font-bold text-gray-800">{{ counseling.grade }}학년</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if counseling.contact %}
+                        <div class="flex items-center p-4 bg-gray-50 rounded-xl">
+                            <i class="fas fa-phone text-2xl text-orange-600 mr-4"></i>
+                            <div>
+                                <p class="text-lg text-gray-600">연락처</p>
+                                <p class="text-xl font-bold text-gray-800">{{ counseling.contact }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 학생 이전 상담 이력 -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-history text-gray-600 mr-2"></i>이전 상담 이력
+                        </h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg text-gray-600">총 상담 횟수</span>
+                                <span class="text-lg font-bold text-blue-600">3회</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg text-gray-600">완료된 상담</span>
+                                <span class="text-lg font-bold text-green-600">2회</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg text-gray-600">마지막 상담</span>
+                                <span class="text-lg font-semibold text-gray-800">2024-01-15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상담 통계 -->
+                <div class="bg-white rounded-3xl shadow-2xl p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-chart-bar text-green-600 mr-2"></i>상담 통계
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 rounded-xl p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-lg text-blue-600 font-semibold">이번 달 상담</p>
+                                    <p class="text-3xl font-bold text-blue-800">12건</p>
+                                </div>
+                                <i class="fas fa-calendar-alt text-3xl text-blue-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-xl p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-lg text-green-600 font-semibold">완료율</p>
+                                    <p class="text-3xl font-bold text-green-800">95%</p>
+                                </div>
+                                <i class="fas fa-check-circle text-3xl text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 rounded-xl p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-lg text-yellow-600 font-semibold">평균 응답시간</p>
+                                    <p class="text-3xl font-bold text-yellow-800">4.2시간</p>
+                                </div>
+                                <i class="fas fa-clock text-3xl text-yellow-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 빠른 답변 템플릿 -->
+                <div class="bg-white rounded-3xl shadow-2xl p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-templates text-purple-600 mr-2"></i>빠른 답변
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <button onclick="insertTemplate('academic')" 
+                                class="w-full text-left p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                            <p class="text-lg font-semibold text-blue-800">📚 학업 상담</p>
+                            <p class="text-base text-blue-600">학업 관련 조언 템플릿</p>
+                        </button>
+                        
+                        <button onclick="insertTemplate('career')" 
+                                class="w-full text-left p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors">
+                            <p class="text-lg font-semibold text-green-800">🚀 진로 상담</p>
+                            <p class="text-base text-green-600">진로 관련 조언 템플릿</p>
+                        </button>
+                        
+                        <button onclick="insertTemplate('encouragement')" 
+                                class="w-full text-left p-4 bg-pink-50 hover:bg-pink-100 rounded-xl transition-colors">
+                            <p class="text-lg font-semibold text-pink-800">💪 격려 메시지</p>
+                            <p class="text-base text-pink-600">응원 메시지 템플릿</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateCharCount(textarea) {
+    const charCount = document.getElementById('charCount');
+    const count = textarea.value.length;
+    charCount.textContent = `${count}자`;
+    charCount.className = count < 10 ? 'text-lg text-red-500' : 'text-lg text-gray-500';
+}
+
+function saveDraft() {
+    const response = document.getElementById('response').value;
+    if (response.trim()) {
+        localStorage.setItem('counseling_draft_{{ counseling.id }}', response);
+        alert('임시저장되었습니다.');
+    }
+}
+
+// 페이지 로드 시 임시저장된 내용 복원
+document.addEventListener('DOMContentLoaded', function() {
+    const draft = localStorage.getItem('counseling_draft_{{ counseling.id }}');
+    if (draft && !document.getElementById('response').value) {
+        document.getElementById('response').value = draft;
+        updateCharCount(document.getElementById('response'));
+    }
+});
+
+function insertTemplate(type) {
+    const textarea = document.getElementById('response');
+    let template = '';
+    
+    switch(type) {
+        case 'academic':
+            template = `안녕하세요, {{ counseling.student_name }} 학생.
+
+상담 내용을 잘 읽어보았습니다. 학업과 관련된 고민이 있으시군요.
+
+우선 다음과 같은 방법을 권해드립니다:
+
+1. 학습 계획 세우기
+2. 교수님이나 선배들과의 상담
+3. 스터디 그룹 참여
+
+더 자세한 상담이 필요하시면 언제든 연락주세요.
+
+화이팅!`;
+            break;
+        case 'career':
+            template = `안녕하세요, {{ counseling.student_name }} 학생.
+
+진로에 대한 고민이 많으시군요. 이는 매우 자연스러운 과정입니다.
+
+다음과 같은 활동을 추천드립니다:
+
+1. 자기분석 및 적성검사
+2. 관심 분야 인턴십 경험
+3. 선배들과의 네트워킹
+4. 관련 자격증 취득
+
+진로는 하루아침에 결정되는 것이 아니니 천천히 탐색해보세요.
+
+응원합니다!`;
+            break;
+        case 'encouragement':
+            template = `안녕하세요, {{ counseling.student_name }} 학생.
+
+힘든 시기를 보내고 계시는군요. 하지만 이런 어려움도 성장의 과정이라고 생각합니다.
+
+기억해주세요:
+- 모든 어려움은 일시적입니다
+- 당신은 충분히 능력 있는 학생입니다
+- 도움이 필요할 때는 언제든 요청하세요
+
+항상 응원하고 있습니다. 화이팅!`;
+            break;
+    }
+    
+    if (textarea.value.trim()) {
+        textarea.value = textarea.value + '\n\n' + template;
+    } else {
+        textarea.value = template;
+    }
+    updateCharCount(textarea);
+}
+
+function reopenCounseling(id) {
+    if (confirm('이 상담을 다시 오픈하시겠습니까?')) {
+        // 재오픈 로직 구현
+        fetch(`/professor/counseling/${id}/reopen`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('재오픈 중 오류가 발생했습니다.');
+            }
+        });
+    }
+}
+
+function printCounseling() {
+    window.print();
+}
+
+// 초기 문자 수 카운트
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('response');
+    if (textarea) {
+        updateCharCount(textarea);
+    }
+});
+</script>
+{% endblock %} 

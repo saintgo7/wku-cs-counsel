@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}상담 관리 상세 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-cogs text-red-600 mr-3"></i>상담 관리 상세
+                    </h1>
+                    <p class="text-xl text-gray-600">상담 내용을 관리하고 모니터링하세요</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ url_for('admin_dashboard') }}" 
+                       class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-arrow-left mr-2"></i>대시보드
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <!-- 메인 콘텐츠 -->
+            <div class="xl:col-span-2">
+                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                    <!-- 상담 헤더 -->
+                    <div class="border-b border-gray-200 pb-6 mb-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ counseling.counseling_title }}</h2>
+                                <div class="flex flex-wrap gap-3">
+                                    {% if counseling.counseling_category.value == 'ACADEMIC' %}
+                                        <span class="px-4 py-2 bg-blue-100 text-blue-800 text-lg font-semibold rounded-xl">📚 학업 상담</span>
+                                    {% elif counseling.counseling_category.value == 'CAREER' %}
+                                        <span class="px-4 py-2 bg-green-100 text-green-800 text-lg font-semibold rounded-xl">🚀 진로 상담</span>
+                                    {% elif counseling.counseling_category.value == 'CAMPUS_LIFE' %}
+                                        <span class="px-4 py-2 bg-purple-100 text-purple-800 text-lg font-semibold rounded-xl">🏫 캠퍼스 생활</span>
+                                    {% elif counseling.counseling_category.value == 'PERSONAL' %}
+                                        <span class="px-4 py-2 bg-pink-100 text-pink-800 text-lg font-semibold rounded-xl">💭 개인 상담</span>
+                                    {% else %}
+                                        <span class="px-4 py-2 bg-gray-100 text-gray-800 text-lg font-semibold rounded-xl">📋 기타</span>
+                                    {% endif %}
+                                    
+                                    {% if counseling.status.value == 'PENDING' %}
+                                        <span class="px-4 py-2 bg-yellow-100 text-yellow-800 text-lg font-semibold rounded-xl">⏳ 대기중</span>
+                                    {% elif counseling.status.value == 'IN_PROGRESS' %}
+                                        <span class="px-4 py-2 bg-blue-100 text-blue-800 text-lg font-semibold rounded-xl">⚡ 진행중</span>
+                                    {% elif counseling.status.value == 'COMPLETED' %}
+                                        <span class="px-4 py-2 bg-green-100 text-green-800 text-lg font-semibold rounded-xl">✅ 완료</span>
+                                    {% elif counseling.status.value == 'CANCELLED' %}
+                                        <span class="px-4 py-2 bg-red-100 text-red-800 text-lg font-semibold rounded-xl">❌ 취소</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="text-left lg:text-right">
+                                <div class="flex lg:justify-end items-center gap-1 text-3xl text-yellow-500 mb-2">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= counseling.urgency_level %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="text-xl text-gray-600 mb-4">긴급도 {{ counseling.urgency_level }}/5</p>
+                                
+                                <!-- 타임스탬프 -->
+                                <div class="text-gray-500 space-y-2">
+                                    <div class="flex lg:justify-end items-center gap-2">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <span>등록: {{ counseling.created_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                                    </div>
+                                    <div class="flex lg:justify-end items-center gap-2">
+                                        <i class="fas fa-edit"></i>
+                                        <span>수정: {{ counseling.updated_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상담 내용 -->
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-edit text-blue-600 mr-2"></i>상담 내용
+                        </h3>
+                        <div class="bg-gray-50 rounded-2xl p-6">
+                            <p class="text-lg text-gray-700 leading-relaxed whitespace-pre-wrap">{{ counseling.counseling_content }}</p>
+                        </div>
+                    </div>
+
+                    <!-- 교수님 답변 -->
+                    {% if counseling.professor_response %}
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-green-600 mb-4">
+                            <i class="fas fa-reply mr-2"></i>교수님 답변
+                        </h3>
+                        <div class="bg-green-50 border-l-4 border-green-500 rounded-2xl p-6">
+                            <p class="text-lg text-gray-700 leading-relaxed mb-4 whitespace-pre-wrap">{{ counseling.professor_response }}</p>
+                            {% if counseling.response_date %}
+                            <div class="flex items-center text-green-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span class="font-semibold">답변일: {{ counseling.response_date.strftime('%Y년 %m월 %d일 %H:%M') }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 관리자 메모 -->
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-sticky-note text-red-600 mr-2"></i>관리자 메모
+                        </h3>
+                        
+                        <form action="{{ url_for('admin_update_counseling_notes', counseling_id=counseling.id) }}" method="post">
+                            <div class="mb-4">
+                                <label for="admin_notes" class="block text-lg font-semibold text-gray-700 mb-2">
+                                    내부 관리 메모
+                                </label>
+                                <textarea 
+                                    id="admin_notes" 
+                                    name="admin_notes" 
+                                    rows="6" 
+                                    class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    placeholder="상담 관리를 위한 내부 메모를 작성하세요..."
+                                    oninput="updateCharCount(this, 'adminCharCount')">{{ counseling.admin_notes or '' }}</textarea>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span id="adminCharCount" class="text-gray-500">0자</span>
+                                    <span class="text-gray-500 text-sm">관리용 메모입니다</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                                <h6 class="font-semibold text-red-800 mb-2">
+                                    <i class="fas fa-info-circle mr-2"></i>메모 작성 가이드
+                                </h6>
+                                <ul class="text-red-700 space-y-1">
+                                    <li>• 상담의 특이사항이나 주의점을 기록하세요</li>
+                                    <li>• 후속 조치가 필요한 내용을 명시하세요</li>
+                                    <li>• 다른 관리자와 공유할 정보를 포함하세요</li>
+                                    <li>• 상담 품질 개선을 위한 피드백을 남기세요</li>
+                                </ul>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                                    <i class="fas fa-save mr-2"></i>메모 저장
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 상담 상태 관리 -->
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-list-check text-blue-600 mr-2"></i>상담 상태 관리
+                        </h3>
+                        
+                        <form action="{{ url_for('admin_update_counseling_status', counseling_id=counseling.id) }}" method="post">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="status" class="block text-lg font-semibold text-gray-700 mb-2">
+                                        상담 상태 <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="status" name="status" required class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="PENDING" {% if counseling.status.value == 'PENDING' %}selected{% endif %}>⏳ 대기중</option>
+                                        <option value="IN_PROGRESS" {% if counseling.status.value == 'IN_PROGRESS' %}selected{% endif %}>⚡ 진행중</option>
+                                        <option value="COMPLETED" {% if counseling.status.value == 'COMPLETED' %}selected{% endif %}>✅ 완료</option>
+                                        <option value="CANCELLED" {% if counseling.status.value == 'CANCELLED' %}selected{% endif %}>❌ 취소</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="priority" class="block text-lg font-semibold text-gray-700 mb-2">
+                                        우선순위
+                                    </label>
+                                    <select id="priority" name="priority" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="LOW" {% if counseling.priority == 'LOW' %}selected{% endif %}>🟢 낮음</option>
+                                        <option value="NORMAL" {% if counseling.priority == 'NORMAL' %}selected{% endif %}>🟡 보통</option>
+                                        <option value="HIGH" {% if counseling.priority == 'HIGH' %}selected{% endif %}>🟠 높음</option>
+                                        <option value="URGENT" {% if counseling.priority == 'URGENT' %}selected{% endif %}>🔴 긴급</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="assigned_professor" class="block text-lg font-semibold text-gray-700 mb-2">
+                                        담당 교수님
+                                    </label>
+                                    <select id="assigned_professor" name="assigned_professor" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">담당자 미배정</option>
+                                        {% for prof in professors %}
+                                        <option value="{{ prof.id }}" {% if counseling.assigned_professor and counseling.assigned_professor.id == prof.id %}selected{% endif %}>
+                                            {{ prof.name }} 교수님 ({{ prof.department or '컴퓨터소프트웨어공학과' }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="estimated_duration" class="block text-lg font-semibold text-gray-700 mb-2">
+                                        예상 소요시간 (분)
+                                    </label>
+                                    <input type="number" id="estimated_duration" name="estimated_duration" 
+                                           class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="15" max="180" step="15"
+                                           value="{{ counseling.estimated_duration or 30 }}" placeholder="30">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label for="status_note" class="block text-lg font-semibold text-gray-700 mb-2">
+                                    상태 변경 사유
+                                </label>
+                                <textarea id="status_note" name="status_note" rows="3" 
+                                          class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                          placeholder="상태 변경에 대한 추가 설명을 입력하세요..."></textarea>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                                    <i class="fas fa-check-circle mr-2"></i>상태 업데이트
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사이드바 -->
+            <div class="xl:col-span-1">
+                <!-- 학생 정보 -->
+                <div class="bg-white rounded-3xl shadow-2xl mb-8">
+                    <div class="bg-blue-600 text-white rounded-t-3xl px-6 py-4">
+                        <h5 class="text-xl font-bold">
+                            <i class="fas fa-user mr-2"></i>학생 정보
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-center mb-6">
+                            <div class="bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 w-20 h-20">
+                                {% if counseling.student.profile_image %}
+                                    <img src="{{ counseling.student.profile_image }}" alt="{{ counseling.student.name }}" 
+                                         class="rounded-full w-20 h-20 object-cover">
+                                {% else %}
+                                    <i class="fas fa-graduation-cap text-3xl text-blue-600"></i>
+                                {% endif %}
+                            </div>
+                            <h6 class="text-xl font-bold text-gray-800">{{ counseling.student.name }}</h6>
+                            <p class="text-gray-500">{{ counseling.student.student_id }}</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">학년:</span>
+                                <span class="font-semibold">{{ counseling.student.grade }}학년</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">연락처:</span>
+                                <span class="font-semibold">{{ counseling.student.contact or '미등록' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">이메일:</span>
+                                <span class="font-semibold text-sm">{{ counseling.student.email }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 담당 교수 정보 -->
+                {% if counseling.assigned_professor %}
+                <div class="bg-white rounded-3xl shadow-2xl mb-8">
+                    <div class="bg-green-600 text-white rounded-t-3xl px-6 py-4">
+                        <h5 class="text-xl font-bold">
+                            <i class="fas fa-user-tie mr-2"></i>담당 교수님
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-center mb-6">
+                            <div class="bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 w-20 h-20">
+                                <i class="fas fa-user-tie text-3xl text-green-600"></i>
+                            </div>
+                            <h6 class="text-xl font-bold text-gray-800">{{ counseling.assigned_professor.name }} 교수님</h6>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">학과:</span>
+                                <span class="font-semibold text-sm">{{ counseling.assigned_professor.department or '컴퓨터소프트웨어공학과' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">연락처:</span>
+                                <span class="font-semibold">{{ counseling.assigned_professor.contact or '미등록' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">이메일:</span>
+                                <span class="font-semibold text-sm">{{ counseling.assigned_professor.email }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 빠른 액션 -->
+                <div class="bg-white rounded-3xl shadow-2xl mb-8">
+                    <div class="bg-yellow-500 text-black rounded-t-3xl px-6 py-4">
+                        <h5 class="text-xl font-bold">
+                            <i class="fas fa-bolt mr-2"></i>빠른 액션
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            <form action="{{ url_for('admin_update_counseling_status_short', counseling_id=counseling.id) }}" method="post">
+                                <input type="hidden" name="status" value="IN_PROGRESS">
+                                <button type="submit" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                    <i class="fas fa-play mr-2"></i>진행중으로 변경
+                                </button>
+                            </form>
+
+                            <form action="{{ url_for('admin_assign_to_me', counseling_id=counseling.id) }}" method="post">
+                                <button type="submit" class="w-full px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                    <i class="fas fa-user-check mr-2"></i>내게 배정
+                                </button>
+                            </form>
+
+                            <form action="{{ url_for('admin_mark_urgent', counseling_id=counseling.id) }}" method="post">
+                                <button type="submit" class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>긴급 표시
+                                </button>
+                            </form>
+
+                            <div class="border-t border-gray-200 my-4"></div>
+
+                            <a href="{{ url_for('admin_counseling_detail', counseling_id=counseling.id, _external=True) }}export" 
+                               class="block w-full px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-200 text-center">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF 내보내기
+                            </a>
+
+                            <form action="{{ url_for('admin_send_notification', counseling_id=counseling.id) }}" method="post">
+                                <button type="submit" class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                    <i class="fas fa-bell mr-2"></i>알림 발송
+                                </button>
+                            </form>
+
+                            <div class="border-t border-gray-200 my-4"></div>
+
+                            <form action="{{ url_for('admin_cancel_counseling', counseling_id=counseling.id) }}" method="post" 
+                                  onsubmit="return confirm('정말 이 상담을 취소하시겠습니까?')">
+                                <button type="submit" class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                    <i class="fas fa-times-circle mr-2"></i>상담 취소
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 통계 -->
+                <div class="bg-white rounded-3xl shadow-2xl">
+                    <div class="bg-cyan-600 text-white rounded-t-3xl px-6 py-4">
+                        <h5 class="text-xl font-bold">
+                            <i class="fas fa-chart-line mr-2"></i>상담 통계
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">처리 시간</span>
+                                    <span class="font-bold text-blue-600">
+                                        {% if counseling.status.value == 'COMPLETED' and counseling.response_date %}
+                                            {{ ((counseling.response_date - counseling.created_date).total_seconds() / 3600) | round(1) }}시간
+                                        {% else %}
+                                            진행중
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">조회수</span>
+                                    <span class="font-bold text-cyan-600">{{ counseling.view_count or 0 }}</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">업데이트</span>
+                                    <span class="font-bold text-yellow-600">{{ counseling.update_count or 1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 my-6"></div>
+
+                        <div class="text-center">
+                            <a href="{{ url_for('admin_counseling_report', counseling_id=counseling.id) }}" 
+                               class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl transition-all duration-200">
+                                <i class="fas fa-file-alt mr-2"></i>상세 리포트
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 문자 수 카운트
+function updateCharCount(textarea, counterId) {
+    const count = textarea.value.length;
+    document.getElementById(counterId).textContent = count + '자';
+}
+
+// 페이지 로드 시 문자 수 카운트 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    const adminNotesTextarea = document.getElementById('admin_notes');
+    if (adminNotesTextarea) {
+        updateCharCount(adminNotesTextarea, 'adminCharCount');
+    }
+});
+
+// 상태 변경 시 확인
+document.querySelector('form[action*="admin_update_counseling_status"]').addEventListener('submit', function(e) {
+    const status = document.getElementById('status').value;
+    const statusNote = document.getElementById('status_note').value;
+    
+    if (status === 'CANCELLED' && !statusNote.trim()) {
+        e.preventDefault();
+        alert('상담을 취소할 때는 사유를 입력해주세요.');
+        document.getElementById('status_note').focus();
+        return false;
+    }
+    
+    if (status === 'COMPLETED' && !statusNote.trim()) {
+        if (!confirm('상담을 완료로 변경하시겠습니까?')) {
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+
+// 우선순위 변경 시 시각적 피드백
+document.getElementById('priority').addEventListener('change', function() {
+    const value = this.value;
+    this.className = this.className.replace(/border-\w+-500/g, '');
+    
+    switch(value) {
+        case 'LOW':
+            this.className += ' border-green-500';
+            break;
+        case 'NORMAL':
+            this.className += ' border-yellow-500';
+            break;
+        case 'HIGH':
+            this.className += ' border-orange-500';
+            break;
+        case 'URGENT':
+            this.className += ' border-red-500';
+            break;
+    }
+});
+</script>
+{% endblock %} 

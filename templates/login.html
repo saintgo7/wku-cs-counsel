@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}로그인 - 원광대학교 상담시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
+    <div class="w-full max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-graduation-cap text-4xl text-blue-600"></i>
+            </div>
+            <h2 class="text-4xl font-bold text-gray-900 mb-2">학생 로그인</h2>
+            <p class="text-xl text-gray-600">상담 시스템에 로그인하세요</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
+            <div class="p-8">
+                <form method="POST" class="space-y-6">
+                    <!-- 학번 입력 -->
+                    <div>
+                        <label for="student_id" class="block text-lg font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-id-card mr-2 text-blue-600"></i>학번
+                        </label>
+                        <input type="text" 
+                               id="student_id" 
+                               name="student_id" 
+                               class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                               placeholder="8자리 학번을 입력하세요" 
+                               maxlength="8" 
+                               required>
+                    </div>
+
+                    <!-- 비밀번호 입력 -->
+                    <div>
+                        <label for="password" class="block text-lg font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-lock mr-2 text-blue-600"></i>비밀번호
+                        </label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                               placeholder="비밀번호를 입력하세요" 
+                               required>
+                    </div>
+
+                    <!-- 로그인 버튼 -->
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl text-xl font-bold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-sign-in-alt mr-2"></i>로그인
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+            <div class="p-6 text-center">
+                <div class="mb-6">
+                    <p class="text-lg text-gray-600 mb-4">계정이 없으신가요?</p>
+                    <a href="{{ url_for('register') }}" 
+                       class="inline-block bg-green-600 text-white px-8 py-3 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-user-plus mr-2"></i>회원가입
+                    </a>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-6">
+                    <p class="text-lg text-gray-600 mb-4">관리자이신가요?</p>
+                    <a href="{{ url_for('admin_login') }}" 
+                       class="inline-block bg-red-600 text-white px-8 py-3 rounded-xl text-lg font-semibold hover:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-shield-alt mr-2"></i>관리자 로그인
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 홈으로 돌아가기 -->
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" 
+               class="text-gray-600 hover:text-gray-800 text-lg transition-colors duration-200">
+                <i class="fas fa-home mr-2"></i>홈으로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

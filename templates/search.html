@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}상담 검색 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <h1 class="text-5xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-search text-purple-600 mr-4"></i>상담 검색
+            </h1>
+            <p class="text-xl text-gray-600">다양한 조건으로 상담 내역을 검색해보세요</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- 검색 필터 사이드바 -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-2xl p-6 sticky top-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                        <i class="fas fa-filter text-purple-600 mr-2"></i>검색 필터
+                    </h2>
+                    
+                    <form method="GET" id="searchForm" class="space-y-6">
+                        <!-- 검색어 -->
+                        <div>
+                            <label for="query" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-search mr-2 text-blue-600"></i>검색어
+                            </label>
+                            <input type="text" 
+                                   class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                   id="query" 
+                                   name="query" 
+                                   value="{{ request.args.get('query', '') }}" 
+                                   placeholder="제목, 내용, 학번으로 검색">
+                        </div>
+                        
+                        <!-- 상담 분야 -->
+                        <div>
+                            <label for="category" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-tags mr-2 text-green-600"></i>상담 분야
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                    id="category" 
+                                    name="category">
+                                <option value="">전체</option>
+                                <option value="ACADEMIC" {% if request.args.get('category') == 'ACADEMIC' %}selected{% endif %}>📚 학업 상담</option>
+                                <option value="CAREER" {% if request.args.get('category') == 'CAREER' %}selected{% endif %}>🚀 진로 상담</option>
+                                <option value="CAMPUS_LIFE" {% if request.args.get('category') == 'CAMPUS_LIFE' %}selected{% endif %}>🏫 캠퍼스 생활</option>
+                                <option value="PERSONAL" {% if request.args.get('category') == 'PERSONAL' %}selected{% endif %}>💭 개인 상담</option>
+                                <option value="OTHER" {% if request.args.get('category') == 'OTHER' %}selected{% endif %}>📋 기타</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 상담 상태 -->
+                        <div>
+                            <label for="status" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-info-circle mr-2 text-yellow-600"></i>상담 상태
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                    id="status" 
+                                    name="status">
+                                <option value="">전체</option>
+                                <option value="PENDING" {% if request.args.get('status') == 'PENDING' %}selected{% endif %}>⏳ 대기중</option>
+                                <option value="IN_PROGRESS" {% if request.args.get('status') == 'IN_PROGRESS' %}selected{% endif %}>⚡ 진행중</option>
+                                <option value="COMPLETED" {% if request.args.get('status') == 'COMPLETED' %}selected{% endif %}>✅ 완료</option>
+                                <option value="CANCELLED" {% if request.args.get('status') == 'CANCELLED' %}selected{% endif %}>❌ 취소</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 긴급도 -->
+                        <div>
+                            <label for="urgency" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>긴급도
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                    id="urgency" 
+                                    name="urgency">
+                                <option value="">전체</option>
+                                <option value="5" {% if request.args.get('urgency') == '5' %}selected{% endif %}>⭐⭐⭐⭐⭐ 매우 높음</option>
+                                <option value="4" {% if request.args.get('urgency') == '4' %}selected{% endif %}>⭐⭐⭐⭐ 높음</option>
+                                <option value="3" {% if request.args.get('urgency') == '3' %}selected{% endif %}>⭐⭐⭐ 중간</option>
+                                <option value="2" {% if request.args.get('urgency') == '2' %}selected{% endif %}>⭐⭐ 보통</option>
+                                <option value="1" {% if request.args.get('urgency') == '1' %}selected{% endif %}>⭐ 낮음</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 기간 -->
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-calendar mr-2 text-indigo-600"></i>기간
+                            </label>
+                            <div class="space-y-3">
+                                <div>
+                                    <input type="date" 
+                                           class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                           name="date_from" 
+                                           value="{{ request.args.get('date_from', '') }}" 
+                                           placeholder="시작일">
+                                </div>
+                                <div>
+                                    <input type="date" 
+                                           class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                           name="date_to" 
+                                           value="{{ request.args.get('date_to', '') }}" 
+                                           placeholder="종료일">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 정렬 -->
+                        <div>
+                            <label for="sort" class="block text-lg font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-sort-amount-down mr-2 text-gray-600"></i>정렬
+                            </label>
+                            <select class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-gray-50 transition-all duration-200" 
+                                    id="sort" 
+                                    name="sort">
+                                <option value="date_desc" {% if request.args.get('sort') == 'date_desc' %}selected{% endif %}>최신순</option>
+                                <option value="date_asc" {% if request.args.get('sort') == 'date_asc' %}selected{% endif %}>오래된순</option>
+                                <option value="urgency_desc" {% if request.args.get('sort') == 'urgency_desc' %}selected{% endif %}>긴급도 높은순</option>
+                                <option value="urgency_asc" {% if request.args.get('sort') == 'urgency_asc' %}selected{% endif %}>긴급도 낮은순</option>
+                                <option value="title_asc" {% if request.args.get('sort') == 'title_asc' %}selected{% endif %}>제목순</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 버튼 -->
+                        <div class="space-y-3">
+                            <button type="submit" 
+                                    class="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fas fa-search mr-2"></i>검색
+                            </button>
+                            <a href="{{ url_for('search_counselings') }}" 
+                               class="block text-center w-full bg-gray-500 text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fas fa-redo mr-2"></i>초기화
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 검색 결과 -->
+            <div class="lg:col-span-3">
+                <!-- 검색 결과 헤더 -->
+                <div class="bg-white rounded-2xl shadow-2xl p-6 mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start gap-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-3">검색 결과</h2>
+                            {% if request.args.get('query') or request.args.get('category') or request.args.get('status') %}
+                            <p class="text-lg text-gray-600">
+                                {% if counselings %}
+                                    <span class="text-purple-600 font-bold">{{ counselings|length }}개</span>의 상담을 찾았습니다
+                                {% else %}
+                                    검색 조건에 맞는 상담이 없습니다
+                                {% endif %}
+                            </p>
+                            {% else %}
+                            <p class="text-lg text-gray-600">검색 조건을 입력하여 상담을 찾아보세요</p>
+                            {% endif %}
+                        </div>
+                        
+                        {% if counselings %}
+                        <div class="flex space-x-2">
+                            <button type="button" 
+                                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200" 
+                                    onclick="toggleView('card')">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button type="button" 
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-200" 
+                                    onclick="toggleView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- 활성 필터 표시 -->
+                {% if request.args.get('query') or request.args.get('category') or request.args.get('status') or request.args.get('urgency') %}
+                <div class="bg-white rounded-2xl shadow-2xl p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">활성 필터</h3>
+                    <div class="flex flex-wrap gap-3">
+                        {% if request.args.get('query') %}
+                        <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-2 rounded-full">
+                            검색어: {{ request.args.get('query') }}
+                            <a href="{{ url_for('search_counselings', category=request.args.get('category'), status=request.args.get('status'), urgency=request.args.get('urgency'), date_from=request.args.get('date_from'), date_to=request.args.get('date_to'), sort=request.args.get('sort')) }}" 
+                               class="text-blue-800 ml-2 hover:text-blue-900">×</a>
+                        </span>
+                        {% endif %}
+                        
+                        {% if request.args.get('category') %}
+                        <span class="bg-green-100 text-green-800 text-sm font-semibold px-4 py-2 rounded-full">
+                            분야: 
+                            {% if request.args.get('category') == 'ACADEMIC' %}📚 학업 상담
+                            {% elif request.args.get('category') == 'CAREER' %}🚀 진로 상담
+                            {% elif request.args.get('category') == 'CAMPUS_LIFE' %}🏫 캠퍼스 생활
+                            {% elif request.args.get('category') == 'PERSONAL' %}💭 개인 상담
+                            {% else %}📋 기타
+                            {% endif %}
+                            <a href="{{ url_for('search_counselings', query=request.args.get('query'), status=request.args.get('status'), urgency=request.args.get('urgency'), date_from=request.args.get('date_from'), date_to=request.args.get('date_to'), sort=request.args.get('sort')) }}" 
+                               class="text-green-800 ml-2 hover:text-green-900">×</a>
+                        </span>
+                        {% endif %}
+                        
+                        {% if request.args.get('status') %}
+                        <span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-2 rounded-full">
+                            상태: 
+                            {% if request.args.get('status') == 'PENDING' %}⏳ 대기중
+                            {% elif request.args.get('status') == 'IN_PROGRESS' %}⚡진행중
+                            {% elif request.args.get('status') == 'COMPLETED' %}✅ 완료
+                            {% else %}❌ 취소
+                            {% endif %}
+                            <a href="{{ url_for('search_counselings', query=request.args.get('query'), category=request.args.get('category'), urgency=request.args.get('urgency'), date_from=request.args.get('date_from'), date_to=request.args.get('date_to'), sort=request.args.get('sort')) }}" 
+                               class="text-yellow-800 ml-2 hover:text-yellow-900">×</a>
+                        </span>
+                        {% endif %}
+                        
+                        {% if request.args.get('urgency') %}
+                        <span class="bg-red-100 text-red-800 text-sm font-semibold px-4 py-2 rounded-full">
+                            긴급도: {{ request.args.get('urgency') }}
+                            <a href="{{ url_for('search_counselings', query=request.args.get('query'), category=request.args.get('category'), status=request.args.get('status'), date_from=request.args.get('date_from'), date_to=request.args.get('date_to'), sort=request.args.get('sort')) }}" 
+                               class="text-red-800 ml-2 hover:text-red-900">×</a>
+                        </span>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('search_counselings') }}" 
+                           class="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition-all duration-200">
+                            <i class="fas fa-times-circle mr-2"></i>모든 필터 제거
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 상담 목록 -->
+                {% if counselings %}
+                <div id="counseling-list" class="space-y-6">
+                    {% for counseling in counselings %}
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-grow">
+                                    <div class="flex gap-3 mb-4">
+                                        {% if counseling.counseling_category.value == 'ACADEMIC' %}
+                                            <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">📚 학업</span>
+                                        {% elif counseling.counseling_category.value == 'CAREER' %}
+                                            <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">🚀 진로</span>
+                                        {% elif counseling.counseling_category.value == 'CAMPUS_LIFE' %}
+                                            <span class="bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">🏫 생활</span>
+                                        {% elif counseling.counseling_category.value == 'PERSONAL' %}
+                                            <span class="bg-pink-100 text-pink-800 text-sm font-semibold px-3 py-1 rounded-full">💭 개인</span>
+                                        {% endif %}
+                                        
+                                        {% if counseling.status.value == 'PENDING' %}
+                                            <span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">⏳ 대기중</span>
+                                        {% elif counseling.status.value == 'IN_PROGRESS' %}
+                                            <span class="bg-cyan-100 text-cyan-800 text-sm font-semibold px-3 py-1 rounded-full">⚡ 진행중</span>
+                                        {% elif counseling.status.value == 'COMPLETED' %}
+                                            <span class="bg-emerald-100 text-emerald-800 text-sm font-semibold px-3 py-1 rounded-full">✅ 완료</span>
+                                        {% endif %}
+                                    </div>
+                                    <h4 class="text-2xl font-bold text-gray-900 mb-3">{{ counseling.counseling_title }}</h4>
+                                    <p class="text-gray-600 mb-4 text-lg leading-relaxed">
+                                        {{ counseling.counseling_content[:100] }}{% if counseling.counseling_content|length > 100 %}...{% endif %}
+                                    </p>
+                                    <div class="flex items-center text-gray-500">
+                                        <i class="fas fa-calendar mr-2"></i>
+                                        <span>{{ counseling.created_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-6">
+                                    <a href="{{ url_for('view_counseling', counseling_id=counseling.id) }}" 
+                                       class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all duration-200 inline-flex items-center">
+                                        <i class="fas fa-eye mr-2"></i>보기
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-white rounded-2xl shadow-2xl p-12 text-center">
+                    <div class="text-6xl mb-6">📝</div>
+                    <h4 class="text-3xl font-bold text-gray-500 mb-4">검색 결과가 없습니다</h4>
+                    <p class="text-xl text-gray-600 mb-8">다른 검색 조건을 시도해보세요</p>
+                    <a href="{{ url_for('add_counseling') }}" 
+                       class="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center">
+                        <i class="fas fa-plus mr-3"></i>상담 신청하기
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleView(viewType) {
+    // 뷰 타입 변경 기능 구현
+    console.log('View type:', viewType);
+}
+</script>
+{% endblock %} 

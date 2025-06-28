@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}통계 분석 - 원광대학교 컴퓨터소프트웨어공학과 상담 시스템{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-chart-bar text-purple-600 mr-3"></i>통계 분석
+                    </h1>
+                    <p class="text-xl text-gray-600">상담 시스템의 통계와 분석 데이터를 확인하세요</p>
+                </div>
+                <a href="{{ url_for('admin_dashboard') }}" 
+                   class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-arrow-left mr-2"></i>대시보드로
+                </a>
+            </div>
+        </div>
+
+        <!-- 기간 선택 -->
+        <div class="mb-8">
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-calendar text-purple-600 mr-2"></i>기간 선택
+                </h2>
+                <form method="GET" action="{{ url_for('statistics') }}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="start_date" class="block text-lg font-semibold text-gray-700 mb-2">시작일</label>
+                            <input type="date" name="start_date" id="start_date" 
+                                   class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                                   value="{{ current_filters.start_date }}">
+                        </div>
+                        <div>
+                            <label for="end_date" class="block text-lg font-semibold text-gray-700 mb-2">종료일</label>
+                            <input type="date" name="end_date" id="end_date" 
+                                   class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                                   value="{{ current_filters.end_date }}">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" 
+                                    class="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                                <i class="fas fa-search mr-2"></i>조회
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 전체 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">총 상담 수</h3>
+                        <p class="text-3xl font-bold">{{ stats.total_counselings }}</p>
+                    </div>
+                    <i class="fas fa-comments text-4xl opacity-80"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-6 text-white shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">완료된 상담</h3>
+                        <p class="text-3xl font-bold">{{ stats.completed_counselings }}</p>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl opacity-80"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-3xl p-6 text-white shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">진행 중</h3>
+                        <p class="text-3xl font-bold">{{ stats.in_progress_counselings }}</p>
+                    </div>
+                    <i class="fas fa-clock text-4xl opacity-80"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-6 text-white shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">대기 중</h3>
+                        <p class="text-3xl font-bold">{{ stats.pending_counselings }}</p>
+                    </div>
+                    <i class="fas fa-hourglass-half text-4xl opacity-80"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 차트 섹션 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- 분야별 상담 현황 -->
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-pie-chart text-purple-600 mr-2"></i>분야별 상담 현황
+                </h3>
+                <div class="h-80">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 월별 상담 추이 -->
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-line-chart text-purple-600 mr-2"></i>월별 상담 추이
+                </h3>
+                <div class="h-80">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상세 통계 테이블 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 교수별 상담 현황 -->
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-user-tie text-purple-600 mr-2"></i>교수별 상담 현황
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200">
+                                <th class="text-left py-3 px-4 text-lg font-semibold text-gray-700">교수명</th>
+                                <th class="text-center py-3 px-4 text-lg font-semibold text-gray-700">상담 수</th>
+                                <th class="text-center py-3 px-4 text-lg font-semibold text-gray-700">완료율</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for professor_stat in stats.professor_stats %}
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-lg">{{ professor_stat.name }}</td>
+                                <td class="py-3 px-4 text-center text-lg font-semibold">{{ professor_stat.total }}</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                               {% if professor_stat.completion_rate >= 80 %}bg-green-100 text-green-800
+                                               {% elif professor_stat.completion_rate >= 60 %}bg-yellow-100 text-yellow-800
+                                               {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ professor_stat.completion_rate }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 학년별 상담 현황 -->
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-graduation-cap text-purple-600 mr-2"></i>학년별 상담 현황
+                </h3>
+                <div class="space-y-4">
+                    {% for grade_stat in stats.grade_stats %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-lg font-bold text-purple-600">{{ grade_stat.grade }}</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">{{ grade_stat.grade }}학년</h4>
+                                <p class="text-gray-600">총 {{ grade_stat.total }}건</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800">{{ grade_stat.percentage }}%</div>
+                            <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-purple-600 h-2 rounded-full" style="width: {{ grade_stat.percentage }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 긴급도별 통계 -->
+        <div class="mt-8">
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-exclamation-triangle text-purple-600 mr-2"></i>긴급도별 상담 현황
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {% for urgency_stat in stats.urgency_stats %}
+                    <div class="text-center p-4 rounded-2xl 
+                              {% if urgency_stat.level >= 4 %}bg-red-50 border-2 border-red-200
+                              {% elif urgency_stat.level >= 3 %}bg-yellow-50 border-2 border-yellow-200
+                              {% else %}bg-gray-50 border-2 border-gray-200{% endif %}">
+                        <div class="text-3xl font-bold mb-2 
+                                  {% if urgency_stat.level >= 4 %}text-red-600
+                                  {% elif urgency_stat.level >= 3 %}text-yellow-600
+                                  {% else %}text-gray-600{% endif %}">
+                            {{ urgency_stat.count }}
+                        </div>
+                        <div class="text-lg font-semibold text-gray-700">긴급도 {{ urgency_stat.level }}</div>
+                        <div class="text-sm text-gray-600">{{ urgency_stat.percentage }}%</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 응답 시간 통계 -->
+        <div class="mt-8">
+            <div class="bg-white rounded-3xl shadow-2xl p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-stopwatch text-purple-600 mr-2"></i>평균 응답 시간
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center p-6 bg-blue-50 rounded-2xl">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.avg_response_time.hours }}시간</div>
+                        <div class="text-lg font-semibold text-gray-700">평균 응답 시간</div>
+                        <div class="text-sm text-gray-600">상담 접수부터 첫 응답까지</div>
+                    </div>
+                    <div class="text-center p-6 bg-green-50 rounded-2xl">
+                        <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.avg_completion_time.days }}일</div>
+                        <div class="text-lg font-semibold text-gray-700">평균 완료 시간</div>
+                        <div class="text-sm text-gray-600">상담 시작부터 완료까지</div>
+                    </div>
+                    <div class="text-center p-6 bg-purple-50 rounded-2xl">
+                        <div class="text-3xl font-bold text-purple-600 mb-2">{{ stats.satisfaction_score }}</div>
+                        <div class="text-lg font-semibold text-gray-700">만족도 점수</div>
+                        <div class="text-sm text-gray-600">5점 만점 기준</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 분야별 상담 현황 차트
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+const categoryChart = new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for category in stats.category_stats %}
+                '{{ category.name }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for category in stats.category_stats %}
+                    {{ category.count }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        size: 14
+                    },
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+
+// 월별 상담 추이 차트
+const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+const monthlyChart = new Chart(monthlyCtx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for month in stats.monthly_stats %}
+                '{{ month.month }}월',
+            {% endfor %}
+        ],
+        datasets: [{
+            label: '상담 수',
+            data: [
+                {% for month in stats.monthly_stats %}
+                    {{ month.count }},
+                {% endfor %}
+            ],
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}상담 통계{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-4xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-chart-bar text-green-600 mr-4 text-5xl"></i>
+                        상담 통계 분석
+                    </h1>
+                    <p class="text-xl text-gray-600 mt-2">상세한 상담 현황과 분석 데이터를 확인하세요</p>
+                </div>
+                <div class="bg-green-50 px-6 py-3 rounded-xl">
+                    <p class="text-lg font-semibold text-green-800 flex items-center">
+                        <i class="fas fa-analytics mr-2"></i>
+                        통계 대시보드
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 전체 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <!-- 전체 상담 -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-bold">{{ total_counselings }}</p>
+                        <p class="text-sm font-semibold text-blue-100 mt-1">전체 상담</p>
+                    </div>
+                    <div class="bg-blue-400/30 p-3 rounded-xl">
+                        <i class="fas fa-comments text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대기 중 -->
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-2xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-bold">{{ pending_counselings }}</p>
+                        <p class="text-sm font-semibold text-yellow-100 mt-1">대기 중</p>
+                    </div>
+                    <div class="bg-yellow-400/30 p-3 rounded-xl">
+                        <i class="fas fa-clock text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 진행 중 -->
+            <div class="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-bold">{{ in_progress_counselings }}</p>
+                        <p class="text-sm font-semibold text-cyan-100 mt-1">진행 중</p>
+                    </div>
+                    <div class="bg-cyan-400/30 p-3 rounded-xl">
+                        <i class="fas fa-spinner text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 완료 -->
+            <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-2xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-bold">{{ completed_counselings }}</p>
+                        <p class="text-sm font-semibold text-green-100 mt-1">완료</p>
+                    </div>
+                    <div class="bg-green-400/30 p-3 rounded-xl">
+                        <i class="fas fa-check-circle text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 취소 -->
+            <div class="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-bold">{{ cancelled_counselings }}</p>
+                        <p class="text-sm font-semibold text-red-100 mt-1">취소</p>
+                    </div>
+                    <div class="bg-red-400/30 p-3 rounded-xl">
+                        <i class="fas fa-times-circle text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- 분야별 통계 -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+                    <h3 class="text-2xl font-bold text-blue-800 flex items-center">
+                        <i class="fas fa-chart-pie mr-3 text-blue-600"></i>분야별 상담 현황
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for category, count in category_stats.items() %}
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                            <span class="text-lg font-semibold text-gray-900">{{ category }}</span>
+                            <div class="flex items-center space-x-3">
+                                <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">{{ count }}</span>
+                                <div class="w-24 bg-gray-200 rounded-full h-3">
+                                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                                         style="width: {{ (count / total_counselings * 100) if total_counselings > 0 else 0 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 긴급도별 통계 -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-orange-50 px-6 py-4 border-b border-orange-100">
+                    <h3 class="text-2xl font-bold text-orange-800 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3 text-orange-600"></i>긴급도별 현황
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for level, stats in urgency_stats.items() %}
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-semibold text-gray-900">긴급도 {{ level }}</span>
+                                {% if level >= 4 %}
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold">높음</span>
+                                {% elif level >= 3 %}
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">보통</span>
+                                {% else %}
+                                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-bold">낮음</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold">{{ stats }}</span>
+                                <div class="w-20 bg-gray-200 rounded-full h-3">
+                                    <div class="bg-orange-600 h-3 rounded-full transition-all duration-300" 
+                                         style="width: {{ (stats / total_counselings * 100) if total_counselings > 0 else 0 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 분야별 상세 통계 -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+            <div class="bg-purple-50 px-6 py-4 border-b border-purple-100">
+                <h3 class="text-2xl font-bold text-purple-800 flex items-center">
+                    <i class="fas fa-chart-bar mr-3 text-purple-600"></i>분야별 상세 통계
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-4 px-4 text-lg font-semibold text-gray-900">분야</th>
+                                <th class="text-center py-4 px-4 text-lg font-semibold text-gray-900">대기중</th>
+                                <th class="text-center py-4 px-4 text-lg font-semibold text-gray-900">진행중</th>
+                                <th class="text-center py-4 px-4 text-lg font-semibold text-gray-900">완료</th>
+                                <th class="text-center py-4 px-4 text-lg font-semibold text-gray-900">취소</th>
+                                <th class="text-center py-4 px-4 text-lg font-semibold text-gray-900">전체</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, details in category_detail_stats.items() %}
+                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                <td class="py-4 px-4 text-base font-semibold text-gray-900">{{ category }}</td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ details.PENDING }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ details.IN_PROGRESS }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ details.COMPLETED }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ details.CANCELLED }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ details.PENDING + details.IN_PROGRESS + details.COMPLETED + details.CANCELLED }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 월별 통계 -->
+        {% if monthly_stats %}
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+            <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
+                <h3 class="text-2xl font-bold text-indigo-800 flex items-center">
+                    <i class="fas fa-calendar-alt mr-3 text-indigo-600"></i>월별 상담 현황
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for month, count in monthly_stats.items() %}
+                    <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-semibold text-indigo-900">{{ month }}월</span>
+                            <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-bold">{{ count }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <div class="w-full bg-indigo-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
+                                     style="width: {{ (count / total_counselings * 100) if total_counselings > 0 else 0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 빠른 액션 버튼들 -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">빠른 관리 메뉴</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="{{ url_for('professor_dashboard') }}" 
+                   class="bg-purple-600 text-white p-6 rounded-2xl text-center hover:bg-purple-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-tachometer-alt text-4xl mb-4"></i>
+                    <p class="text-xl font-bold">대시보드로</p>
+                    <p class="text-sm opacity-90 mt-2">메인 대시보드로 돌아가기</p>
+                </a>
+                
+                <a href="{{ url_for('professor_counselings') }}" 
+                   class="bg-blue-600 text-white p-6 rounded-2xl text-center hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-comments text-4xl mb-4"></i>
+                    <p class="text-xl font-bold">상담 관리</p>
+                    <p class="text-sm opacity-90 mt-2">전체 상담 목록 관리</p>
+                </a>
+                
+                <a href="{{ url_for('profile') }}" 
+                   class="bg-green-600 text-white p-6 rounded-2xl text-center hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-user-cog text-4xl mb-4"></i>
+                    <p class="text-xl font-bold">프로필 관리</p>
+                    <p class="text-sm opacity-90 mt-2">개인정보 및 설정 변경</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

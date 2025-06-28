@@ -23,6 +23,13 @@
                        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
                         <i class="fas fa-plus mr-2"></i>새 상담 신청
                     </a>
+                    {% if session.user_id %}
+                    <a href="{{ url_for('logout') }}" 
+                       class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                       onclick="return confirm('정말 로그아웃하시겠습니까?')">
+                        <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -318,7 +318,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if session.user_id %}
-                        {% if session.role == 'admin' %}
+                        {% if session.is_admin %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
                                     <i class="bi bi-speedometer2 me-1"></i>관리자 대시보드
@@ -339,7 +339,7 @@
                                     <i class="bi bi-person-badge me-1"></i>교수 관리
                                 </a>
                             </li>
-                        {% elif session.role == 'professor' %}
+                        {% elif session.is_professor %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('professor_dashboard') }}">
                                     <i class="bi bi-speedometer2 me-1"></i>교수 대시보드
@@ -372,7 +372,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('search_counselings') }}">
+                                <a class="nav-link" href="{{ url_for('search') }}">
                                     <i class="bi bi-search me-1"></i>상담 검색
                                 </a>
                             </li>
@@ -382,24 +382,44 @@
                 
                 <ul class="navbar-nav ms-auto">
                     {% if session.user_id %}
+                        <!-- 사용자 정보 표시 -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>{{ session.username }}
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>{{ session.user_name or session.username or '사용자' }}
+                                {% if session.is_admin %}
+                                    <span class="badge bg-danger ms-1">관리자</span>
+                                {% elif session.is_professor %}
+                                    <span class="badge bg-info ms-1">교수</span>
+                                {% else %}
+                                    <span class="badge bg-success ms-1">학생</span>
+                                {% endif %}
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">
+                                    <i class="bi bi-person me-1"></i>{{ session.user_name or session.username or '사용자' }}님
+                                </h6></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('profile') }}">
-                                    <i class="bi bi-person me-2"></i>프로필
+                                    <i class="bi bi-person me-2"></i>프로필 설정
                                 </a></li>
-                                {% if session.role == 'student' %}
-                                <li><a class="dropdown-item" href="{{ url_for('user_statistics') }}">
-                                    <i class="bi bi-graph-up me-2"></i>내 통계
+                                {% if not session.is_admin and not session.is_professor %}
+                                <li><a class="dropdown-item" href="{{ url_for('manage_counselings') }}">
+                                    <i class="bi bi-chat-dots me-2"></i>내 상담
                                 </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
                                     <i class="bi bi-box-arrow-right me-2"></i>로그아웃
                                 </a></li>
                             </ul>
+                        </li>
+                        <!-- 직접 로그아웃 버튼 (항상 표시) -->
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-bold" href="{{ url_for('logout') }}" 
+                               onclick="return confirm('정말 로그아웃하시겠습니까?')"
+                               title="로그아웃">
+                                <i class="bi bi-box-arrow-right me-1"></i>로그아웃
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -412,6 +432,15 @@
                                 <i class="bi bi-person-plus me-1"></i>회원가입
                             </a>
                         </li>
+                    {% endif %}
+                    
+                    <!-- 디버깅용 세션 정보 (개발 중에만 표시) -->
+                    {% if config.DEBUG %}
+                    <li class="nav-item">
+                        <a class="nav-link text-muted small" href="{{ url_for('debug_session') }}" target="_blank">
+                            <i class="bi bi-bug me-1"></i>세션
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>

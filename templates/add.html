@@ -149,11 +149,20 @@
                     </div>
                     
                     <!-- 제출 버튼 -->
-                    <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6">
-                        <a href="{{ url_for('index') }}" 
-                           class="bg-gray-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-600 transition-colors duration-200 text-center">
-                            <i class="fas fa-arrow-left mr-2"></i>취소
-                        </a>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between pt-6">
+                        <div class="flex gap-4">
+                            <a href="{{ url_for('index') }}" 
+                               class="bg-gray-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-600 transition-colors duration-200 text-center">
+                                <i class="fas fa-arrow-left mr-2"></i>취소
+                            </a>
+                            {% if session.user_id %}
+                            <a href="{{ url_for('logout') }}" 
+                               class="bg-red-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-red-600 transition-colors duration-200 text-center"
+                               onclick="return confirm('정말 로그아웃하시겠습니까? 작성 중인 내용이 사라집니다.')">
+                                <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
+                            </a>
+                            {% endif %}
+                        </div>
                         <button type="submit" 
                                 class="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
                             <i class="fas fa-paper-plane mr-2"></i>상담 신청하기

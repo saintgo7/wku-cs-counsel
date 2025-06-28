@@ -10,6 +10,14 @@ app.config['SECRET_KEY'] = 'your_secret_key_for_wku_cs_counseling'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wku_cs_counseling.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 세션 설정 (쿠키 관련)
+app.config['SESSION_COOKIE_SECURE'] = False  # HTTP에서 작동하도록 (HTTPS가 아닌 경우)
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # XSS 공격 방지
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF 공격 방지
+app.config['SESSION_COOKIE_DOMAIN'] = None  # 모든 도메인에서 작동
+app.config['SESSION_COOKIE_PATH'] = '/'  # 전체 경로에서 작동
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 세션 유효 시간 (1시간)
+
 db = SQLAlchemy(app)
 
 # nl2br 필터 추가
@@ -87,7 +95,7 @@ class Student(db.Model):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     
     # 관계 설정
-    counselings = db.relationship('CounselingRecord', backref='student_info', lazy=True)
+    counselings = db.relationship('CounselingRecord', backref='student', lazy=True)
 
 # 상담 기록 모델
 class CounselingRecord(db.Model):
@@ -275,6 +283,20 @@ def index():
     # 대시보드 데이터 처리 제거 - 단순한 첫 화면으로 변경
     return render_template('index.html')
 
+@app.route('/debug_session')
+def debug_session():
+    """세션 디버깅용 임시 페이지"""
+    session_info = {
+        'user_id': session.get('user_id'),
+        'student_id': session.get('student_id'),
+        'user_name': session.get('user_name'),
+        'role': session.get('role'),
+        'is_admin': session.get('is_admin'),
+        'is_professor': session.get('is_professor'),
+        'all_session': dict(session)
+    }
+    return f"<pre>{session_info}</pre>"
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -346,6 +368,7 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """학생 및 교수 전용 로그인"""
     if request.method == 'POST':
         student_id = request.form['student_id']
         password = request.form['password']
@@ -353,20 +376,30 @@ def login():
         user = User.query.filter_by(student_id=student_id).first()
         
         if user and user.check_password(password):
-            session['user_id'] = user.id
-            session['student_id'] = user.student_id
-            session['user_name'] = user.name
-            session['is_professor'] = user.is_professor()
-            flash(f'{user.name}님, 환영합니다!', 'success')
-            
-            # 사용자 역할에 따라 적절한 페이지로 리다이렉트
+            # 관리자 계정인 경우 로그인 거부
             if user.is_admin():
-                return redirect(url_for('admin_dashboard'))
-            elif user.is_professor():
-                return redirect(url_for('professor_dashboard'))
+                flash('관리자 계정은 관리자 로그인 페이지를 이용해주세요.', 'warning')
+                return render_template('login.html')
+            
+            # 학생 또는 교수만 로그인 허용
+            if user.role in [UserRole.STUDENT, UserRole.PROFESSOR]:
+                session.permanent = True  # 세션을 영구적으로 설정
+                session['user_id'] = user.id
+                session['student_id'] = user.student_id
+                session['user_name'] = user.name
+                session['is_professor'] = user.is_professor()
+                session['is_admin'] = user.is_admin()
+                session['role'] = user.role.value  # 역할 정보도 추가
+                flash(f'{user.name}님, 환영합니다!', 'success')
+                
+                # 사용자 역할에 따라 적절한 페이지로 리다이렉트
+                if user.is_professor():
+                    return redirect(url_for('professor_dashboard'))
+                else:
+                    # 일반 학생은 상담 관리 페이지로
+                    return redirect(url_for('manage_counselings'))
             else:
-                # 일반 학생은 상담 관리 페이지로
-                return redirect(url_for('manage_counselings'))
+                flash('접근 권한이 없습니다.', 'error')
         else:
             flash('학번 또는 비밀번호가 올바르지 않습니다.', 'error')
     
@@ -1183,17 +1216,23 @@ def admin_login():
         user = User.query.filter_by(student_id=student_id).first()
         
         if user and user.check_password(password):
+            # 관리자 계정만 로그인 허용
             if user.is_admin():
+                session.permanent = True  # 세션을 영구적으로 설정
                 session['user_id'] = user.id
                 session['student_id'] = user.student_id
                 session['user_name'] = user.name
                 session['role'] = user.role.value
-                session['is_admin'] = True
+                session['is_admin'] = user.is_admin()
                 session['is_professor'] = user.is_professor()
                 flash(f'{user.name} 관리자님, 환영합니다!', 'success')
                 return redirect(url_for('admin_dashboard'))
             else:
-                flash('관리자 권한이 없습니다.', 'error')
+                # 학생/교수 계정인 경우 일반 로그인 안내
+                if user.role in [UserRole.STUDENT, UserRole.PROFESSOR]:
+                    flash('학생 및 교수 계정은 일반 로그인 페이지를 이용해주세요.', 'warning')
+                else:
+                    flash('관리자 권한이 없습니다.', 'error')
         else:
             flash('학번 또는 비밀번호가 잘못되었습니다.', 'error')
     
@@ -2505,4 +2544,4 @@ def professor_update_counseling_status(counseling_id):
         return jsonify({'success': False, 'message': f'업데이트 중 오류가 발생했습니다: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001, host='0.0.0.0')
